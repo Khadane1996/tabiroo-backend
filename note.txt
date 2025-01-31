@@ -1,0 +1,40 @@
+
+-Créons nos tables:
+    php artisan make:migration create_roles_table
+
+-Créons son model:
+	php artisan make:model Role
+
+-Créons une classe seeder pour la table roles:
+	php artisan make:seeder RolesTableSeeder
+
+-Créons des factory
+	php artisan make:factory RoleFactory --model=Role
+
+-Créons les contrôleurs:
+	php artisan make:controller API/V1/AuthController
+
+
+'token' => $user->createToken("API TOKEN")->plainTextToken
+
+
+composer require twilio/sdk
+
+-> php artisan tinker
+
+	$sid = env('TWILIO_SID');
+	$token = env('TWILIO_TOKEN');
+	$from = env('TWILIO_PHONE');
+	$client = new \Twilio\Rest\Client($sid, $token);
+	$client->messages->create('+221781311030', ['from' => $from, 'body' => 'Je teste l\'envoi des messages']);
+
++18148319596
++221781311030
+
+->php artisan config:clear
+
+->php artisan serve --host 192.168.10.29 --port 8000
+
+
+lsof -i :8000
+kill -9 9255 9256 9257 9258
