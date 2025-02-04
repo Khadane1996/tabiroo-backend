@@ -7,9 +7,12 @@ use App\Mail\ConfirmRegistrationMail;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Twilio\Rest\Client;
+use Firebase\JWT\JWT;
+use Firebase\JWT\JWK;
 
 class AuthController extends Controller
 {
@@ -46,8 +49,10 @@ class AuthController extends Controller
             $user->confirmation_code = $confirmationCode;
             $user->save();
 
+            $view = 'mail.confirm';
+
             if ($user->email) {
-                Mail::to($user->email)->send(new ConfirmRegistrationMail($confirmationCode));
+                Mail::to($user->email)->send(new ConfirmRegistrationMail($confirmationCode, $view));
             } else {
                 $this->sendSms($request->phone, $confirmationCode);
             }
@@ -97,7 +102,7 @@ class AuthController extends Controller
                 ], 401);
             }
 
-            $token = $user->createToken("API TOKEN")->plainTextToken;
+            $token = $user->createToken("auth_token")->plainTextToken;
 
             return response()->json([
                 'status' => true,
@@ -183,6 +188,250 @@ class AuthController extends Controller
 
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    function sendOtpforResetPassword(Request $request)
+    {
+        try {
+            $validateUser = Validator::make($request->all(), [
+                'email' => 'nullable|string|email|required_without:phone',
+                'phone' => 'nullable|string|required_without:email',
+            ]);
+
+            if ($validateUser->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Erreur de validation',
+                    'errors' => $validateUser->errors(),
+                ], 422);
+            }
+
+            $user = User::when($request->email, function ($query) use ($request) {
+                    $query->where('email', $request->email);
+                })
+                ->when($request->phone, function ($query) use ($request) {
+                    $query->where('phone', $request->phone);
+                })
+                ->first();
+
+            if (!$user) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Identifiants incorrects',
+                ], 401);
+            }
+            
+            $confirmationCode = random_int(1000, 9999);
+            
+            $user->confirmation_code = $confirmationCode;
+            $user->save();
+
+            $view = 'mail.password';
+
+            if ($user->email) {
+                Mail::to($user->email)->send(new ConfirmRegistrationMail($confirmationCode, $view));
+            } else {
+                $this->sendSms($request->phone, $confirmationCode);
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Requete envoyée avec succès',
+            ], 200);
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Une erreur est survenue : ' . $th->getMessage(),
+            ], 500);
+        }
+    }
+
+    function resetPassword(Request $request)
+    {
+        try {
+            $validateUser = Validator::make($request->all(), [
+                'email' => 'nullable|string|email|required_without:phone',
+                'phone' => 'nullable|string|required_without:email',
+                'password' => 'required|string'
+            ]);
+
+            if ($validateUser->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Erreur de validation',
+                    'errors' => $validateUser->errors(),
+                ], 422);
+            }
+
+            $user = User::when($request->email, function ($query) use ($request) {
+                    $query->where('email', $request->email);
+                })
+                ->when($request->phone, function ($query) use ($request) {
+                    $query->where('phone', $request->phone);
+                })
+                ->first();
+
+            if (!$user) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Identifiants incorrects',
+                ], 401);
+            }
+            
+            $user->password = Hash::make($request->password);
+            $user->save();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Mot de passe modifié avec succès',
+            ], 200);
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Une erreur est survenue : ' . $th->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function googleAuth(Request $request)
+    {
+        try 
+        {
+            $validator = Validator::make($request->all(), [
+                'token' => 'required'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], 400);
+            }
+
+            // Vérification du token Google avec Google API
+            $googleToken = $request->token;
+            $googleUser = Http::get("https://oauth2.googleapis.com/tokeninfo?id_token={$googleToken}")->json();
+
+            if (isset($googleUser['error_description'])) {
+                return response()->json(['error' => 'Token Google invalide'], 401);
+            }
+
+            $user = User::firstOrCreate(
+                ['email' => $googleUser['email']],
+                [
+                    'role_id' => 2,
+                    'etat' => 1,
+                    'password' => Hash::make(uniqid()),
+                ]
+            );
+
+            $token = $user->createToken("auth_token")->plainTextToken;
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Connexion réussie',
+                'token' => $token,
+                'user' => [
+                    'id' => $user->id,
+                    'firstName' => $user->firstName,
+                    'lastName' => $user->lastName,
+                    'email' => $user->email,
+                    'phone' => $user->phone,
+                ],
+            ], 200);
+            
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Une erreur est survenue : ' . $th->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function appleAuth(Request $request)
+    {
+        try 
+        {
+            $validator = Validator::make($request->all(), [
+                'token' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], 400);
+            }
+
+            // Récupérer le token Apple envoyé par le client
+            $appleToken = $request->token;
+
+            // Récupérer les clés publiques d'Apple
+            $appleKeys = Http::get("https://appleid.apple.com/auth/keys")->json();
+            if (!isset($appleKeys['keys'])) {
+                return response()->json(['error' => 'Impossible de récupérer les clés publiques d\'Apple'], 500);
+            }
+
+            // Décoder le token sans vérification pour extraire le header
+            $tokenParts = explode(".", $appleToken);
+            if (count($tokenParts) !== 3) {
+                return response()->json(['error' => 'Token Apple invalide'], 401);
+            }
+
+            // Décoder le header du JWT pour récupérer le "kid"
+            $header = json_decode(base64_decode($tokenParts[0]), true);
+            if (!isset($header['kid'])) {
+                return response()->json(['error' => 'Header JWT invalide'], 401);
+            }
+
+            // Récupérer la clé publique correspondante au "kid"
+            $appleKey = null;
+            foreach ($appleKeys['keys'] as $key) {
+                if ($key['kid'] === $header['kid']) {
+                    $appleKey = $key;
+                    break;
+                }
+            }
+
+            if (!$appleKey) {
+                return response()->json(['error' => 'Clé Apple introuvable'], 401);
+            }
+
+            $publicKeys = JWK::parseKeySet(['keys' => [$appleKey]]);
+            $decodedToken = (array) JWT::decode($appleToken, $publicKeys);
+
+            $email = $decodedToken['email'] ?? null;
+            if (!$email) {
+                return response()->json(['error' => 'Impossible de récupérer l\'email depuis Apple'], 400);
+            }
+
+            // Vérifier si l'utilisateur existe ou le créer
+            $user = User::firstOrCreate(
+                ['email' => $email],
+                [
+                    'role_id' => 2,
+                    'etat' => 1,
+                    'password' => Hash::make(uniqid()),
+                ]
+            );
+
+            $token = $user->createToken("auth_token")->plainTextToken;
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Connexion réussie',
+                'token' => $token,
+                'user' => [
+                    'id' => $user->id,
+                    'firstName' => $user->firstName,
+                    'lastName' => $user->lastName,
+                    'email' => $user->email,
+                    'phone' => $user->phone,
+                ],
+            ], 200);
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Une erreur est survenue : ' . $th->getMessage(),
+            ], 500);
         }
     }
 }

@@ -16,3 +16,8 @@ Route::post("/login", [AuthController::class, "login"]);
 Route::post("/opt", [AuthController::class, "verify"]);
 
 Route::post("/sms", [AuthController::class, "sendSms"]);
+
+Route::post("/send-otp-reset-password", [AuthController::class, "sendOtpforResetPassword"]);
+Route::post("/reset-password", [AuthController::class, "resetPassword"]);
+Route::post("/auth/google", [AuthController::class, "googleAuth"]);
+Route::post("/auth/apple", [AuthController::class, "appleAuth"]);
