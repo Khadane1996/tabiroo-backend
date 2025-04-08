@@ -1,11 +1,17 @@
 
-php artisan serve --host 192.168.10.15 --port 8000
+php artisan serve --host 192.168.1.33 --port 8000
 
 -Créons nos tables:
     php artisan make:migration create_roles_table
+	php artisan make:migration create_adresses_table
+	php artisan make:migration create_bancaires_table
+	php artisan make:migration create_portefeuilles_table
 
 -Créons son model:
 	php artisan make:model Role
+	php artisan make:model Adresse
+	php artisan make:model Bancaire
+	php artisan make:model Portefeuille
 
 -Créons une classe seeder pour la table roles:
 	php artisan make:seeder RolesTableSeeder
@@ -15,6 +21,7 @@ php artisan serve --host 192.168.10.15 --port 8000
 
 -Créons les contrôleurs:
 	php artisan make:controller API/V1/AuthController
+	php artisan make:controller API/V1/ProfilController
 
 
 'token' => $user->createToken("API TOKEN")->plainTextToken

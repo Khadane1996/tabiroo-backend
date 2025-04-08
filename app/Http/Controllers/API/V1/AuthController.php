@@ -4,6 +4,8 @@ namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
 use App\Mail\ConfirmRegistrationMail;
+use App\Models\Adresse;
+use App\Models\Bancaire;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -36,7 +38,7 @@ class AuthController extends Controller
             }
             
             $user = User::create([
-                'firstName' => $request->firstName,
+                'firstNameOrPseudo' => $request->firstNameOrPseudo,
                 'lastName' => $request->lastName,
                 'phone' => $request->phone,
                 'email' => $request->email,
@@ -48,6 +50,14 @@ class AuthController extends Controller
             
             $user->confirmation_code = $confirmationCode;
             $user->save();
+
+            Adresse::create([
+                'user_id' => $user->id
+            ]);
+    
+            Bancaire::create([
+                'user_id' => $user->id
+            ]);
 
             $view = 'mail.confirm';
 
@@ -110,7 +120,7 @@ class AuthController extends Controller
                 'token' => $token,
                 'user' => [
                     'id' => $user->id,
-                    'firstName' => $user->firstName,
+                    'firstNameOrPseudo' => $user->firstNameOrPseudo,
                     'lastName' => $user->lastName,
                     'email' => $user->email,
                     'phone' => $user->phone,
@@ -333,7 +343,7 @@ class AuthController extends Controller
                 'token' => $token,
                 'user' => [
                     'id' => $user->id,
-                    'firstName' => $user->firstName,
+                    'firstNameOrPseudo' => $user->firstNameOrPseudo,
                     'lastName' => $user->lastName,
                     'email' => $user->email,
                     'phone' => $user->phone,
@@ -420,7 +430,7 @@ class AuthController extends Controller
                 'token' => $token,
                 'user' => [
                     'id' => $user->id,
-                    'firstName' => $user->firstName,
+                    'firstNameOrPseudo' => $user->firstNameOrPseudo,
                     'lastName' => $user->lastName,
                     'email' => $user->email,
                     'phone' => $user->phone,
@@ -434,4 +444,74 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+    public function updateProfile(Request $request)
+    {
+        try {
+            $validateUser = Validator::make($request->all(), [
+                'id' => 'required|exists:users,id',
+                'phone' => 'nullable|string|unique:users,phone|required_without:email',
+                'email' => 'nullable|string|unique:users,email|required_without:phone',
+            ]);
+
+            if ($validateUser->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Erreur de validation',
+                    'errors' => $validateUser->errors(),
+                ], 422);
+            }
+
+            $user = User::find($request->id);
+
+            if (!$user) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Utilisateur non trouvé',
+                ], 404);
+            }
+
+            $fileName = null;
+            // if ($user->photo_url) {
+            //     $oldPath = public_path('uploads/profiles/' . $user->photo_url);
+            //     if (file_exists($oldPath)) {
+            //         unlink($oldPath);
+            //     }
+            // }
+
+            // if ($request->hasFile('photo_url')) {
+            //     $file = $request->file('photo_url');
+            //     $fileName = time() . '_' . $file->getClientOriginalName();
+                
+            //     $path = public_path('uploads/profiles');
+            //     if (!file_exists($path)) {
+            //         mkdir($path, 0777, true);
+            //     }
+
+            //     $file->move($path, $fileName);
+            // }
+
+            $user->update([
+                'firstNameOrPseudo' => $request->firstNameOrPseudo,
+                'lastName' => $request->lastName,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'biographie' => $request->biographie,
+                'photo_url' => $fileName
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Profil mis à jour avec succès',
+                'user' => $user
+            ], 200);
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Une erreur est survenue : ' . $th->getMessage(),
+            ], 500);
+        }
+    }
+
 }
