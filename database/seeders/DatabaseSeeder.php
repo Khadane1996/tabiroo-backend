@@ -22,5 +22,11 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         // Role::factory()->count(3)->create();
+
+        $this->call(TypeDePlatSeeder::class);
+        $this->call(TypeDeCuisineSeeder::class);
+        $this->call(RegimeAlimentaireSeeder::class);
+        $this->call(ThemeCulinaireSeeder::class);
+        
     }
 }
