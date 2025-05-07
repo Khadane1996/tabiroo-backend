@@ -16,6 +16,10 @@ php artisan serve --host 192.168.10.15 --port 8000
 	php artisan make:migration create_menus_table
 	php artisan make:migration create_menu_plat_table
 
+	php artisan make:migration create_prestations_table
+	php artisan make:migration create_menu_prestation_table
+
+
 -Créons son model:
 	php artisan make:model Role
 	php artisan make:model Adresse
@@ -29,6 +33,8 @@ php artisan serve --host 192.168.10.15 --port 8000
 	php artisan make:model Plat
 	php artisan make:model Menu
 
+	php artisan make:model Prestation
+
 -Créons une classe seeder pour la table roles:
 	php artisan make:seeder RolesTableSeeder
 
@@ -41,6 +47,7 @@ php artisan serve --host 192.168.10.15 --port 8000
 	php artisan make:controller API/V1/PlatController
 	php artisan make:controller API/V1/MenuController
 	php artisan make:controller API/V1/DataSeedController
+	php artisan make:controller API/V1/PrestationController
 
 
 
