@@ -5,54 +5,114 @@ namespace App\Http\Controllers\API\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Prestation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class PrestationController extends Controller
 {
     public function index()
     {
-        $prestations = Prestation::with(['menus', 'typeDePlat'])->get();
-        return response()->json($prestations);
-    }
-
-    public function store(Request $request)
-    {
-        $validate = Validator::make($request->all(), [
-            'type_de_plat' => 'required|exists:types_de_plat,id',
-            'start_time' => 'required|string',
-            'end_time' => 'required|string',
-            'date_limite' => 'required|string',
-            'heure_arrivee_convive' => 'required|string',
-            'date_prestation' => 'required|string',
-            'menus' => 'required|array',
-            'menus.*' => 'exists:menus,id',
-        ]);
-
-        if ($validate->fails()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Validation error',
-                'errors' => $validate->errors()
-            ], 401);
-        }
-
-        $prestation = Prestation::create($request->only([
-            'type_de_plat', 'start_time', 'end_time', 'date_limite',
-            'heure_arrivee_convive', 'date_prestation'
-        ]));
-
-        $prestation->menus()->attach($request->menus);
+        $user = Auth::user();
+        $prestations = Prestation::with(['menus', 'typeDePlat'])
+            ->where('user_id', $user->id)
+            ->get();
 
         return response()->json([
             'status' => true,
-            'message' => 'Prestation créée avec succès',
-            'data' => $prestation->load(['menus', 'typeDePlat'])
-        ], 201);
+            'message' => 'Liste des prestations de l’utilisateur connecté',
+            'data' => $prestations
+        ]);
+    }
+
+    public function filterByDate(Request $request)
+    {
+        $request->validate([
+            'date_prestation' => 'required|date'
+        ]);
+
+        $user = Auth::user();
+
+        // Exemple : "2025-05-01T00:00:00.000Z" => "2025-05-01"
+        $date = \Carbon\Carbon::parse($request->date_prestation)->toDateString();
+
+        $prestations = Prestation::with(['menus', 'typeDePlat'])
+            ->where('user_id', $user->id)
+            ->whereDate('date_prestation', $date)
+            ->get();
+
+        return response()->json([
+            'status' => true,
+            'message' => "Liste des prestations du $date",
+            'data' => $prestations
+        ]);
+    }
+
+
+    public function store(Request $request)
+    {
+        try {
+
+            $validate = Validator::make($request->all(), [
+                'type_de_plat' => 'required|exists:types_de_plat,id',
+                'start_time' => 'required|string',
+                'end_time' => 'required|string',
+                'date_limite' => 'required|string',
+                'heure_arrivee_convive' => 'required|string',
+                'date_prestation' => 'required|string',
+                'menus' => 'required|array',
+                'menus.*' => 'exists:menus,id',
+            ]);
+
+            if ($validate->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validation error',
+                    'errors' => $validate->errors()
+                ], 401);
+            }
+
+            $user = Auth::user();
+
+            $prestation = Prestation::create([
+                'user_id' => $user->id,
+                'type_de_plat' => $request->type_de_plat,
+                'start_time' => $request->start_time,
+                'end_time' => $request->end_time,
+                'date_limite' => $request->date_limite,
+                'heure_arrivee_convive' => $request->heure_arrivee_convive,
+                'date_prestation' => $request->date_prestation,
+            ]);
+
+            $prestation->menus()->attach($request->menus);
+
+            $data = Prestation::with(['menus', 'typeDePlat'])
+                ->where('id', $prestation->id)
+                ->get();
+                
+            return response()->json([
+                'status' => true,
+                'message' => 'Prestation créée avec succès',
+                'prestation' => $data
+            ], 201);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage()
+            ], 500);
+        }
     }
 
     public function update(Request $request, $id)
     {
-        $prestation = Prestation::findOrFail($id);
+        $user = Auth::user();
+        $prestation = Prestation::where('user_id', $user->id)->find($id);
+
+        if (!$prestation) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Prestation introuvable ou non autorisée'
+            ], 404);
+        }
 
         $validate = Validator::make($request->all(), [
             'type_de_plat' => 'sometimes|exists:types_de_plat,id',
@@ -89,12 +149,45 @@ class PrestationController extends Controller
         ]);
     }
 
+    public function show($id)
+    {
+        $user = Auth::user();
+        $prestation = Prestation::with(['menus', 'typeDePlat'])
+            ->where('user_id', $user->id)
+            ->find($id);
+
+        if (!$prestation) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Prestation introuvable ou non autorisée'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Détails de la prestation',
+            'data' => $prestation
+        ]);
+    }
+
     public function destroy($id)
     {
-        $prestation = Prestation::findOrFail($id);
+        $user = Auth::user();
+        $prestation = Prestation::where('user_id', $user->id)->find($id);
+
+        if (!$prestation) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Prestation introuvable ou non autorisée'
+            ], 404);
+        }
+
         $prestation->menus()->detach();
         $prestation->delete();
 
-        return response()->json(['message' => 'Prestation supprimée.']);
+        return response()->json([
+            'status' => true,
+            'message' => 'Prestation supprimée avec succès'
+        ]);
     }
 }

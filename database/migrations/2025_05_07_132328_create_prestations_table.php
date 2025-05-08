@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('prestations', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('type_de_plat')->constrained('types_de_plat')->onDelete('cascade'); // Clé étrangère pour le type de plat
             $table->string('start_time');
             $table->string('end_time');

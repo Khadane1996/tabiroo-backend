@@ -11,6 +11,7 @@ class Prestation extends Model
     public $table = 'prestations';
 
     protected $fillable = [
+        'user_id',
         'type_de_plat',
         'start_time',
         'end_time',
@@ -18,6 +19,11 @@ class Prestation extends Model
         'heure_arrivee_convive',
         'date_prestation',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function menus()
     {

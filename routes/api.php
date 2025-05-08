@@ -4,6 +4,7 @@ use App\Http\Controllers\API\V1\AuthController;
 use App\Http\Controllers\API\V1\DataSeedController;
 use App\Http\Controllers\API\V1\MenuController;
 use App\Http\Controllers\API\V1\PlatController;
+use App\Http\Controllers\API\V1\PrestationController;
 use App\Http\Controllers\API\V1\ProfilController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -58,3 +59,13 @@ Route::get("/type-plat", [DataSeedController::class, "typePlat"]);
 Route::get("/type-cuisine", [DataSeedController::class, "typeCuisine"]);
 Route::get("/regime-alimentaire", [DataSeedController::class, "regimeAlimentaire"]);
 Route::get("/theme-culinaire", [DataSeedController::class, "themeCulinaire"]);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::prefix('prestations')->group(function () {
+        Route::get('/', [PrestationController::class, 'index']); // Récupérer tous les menus
+        Route::get('{id}', [PrestationController::class, 'show']); // Afficher un menu spécifique
+        Route::post('/', [PrestationController::class, 'store']); // Créer un menu
+        Route::put('{id}', [PrestationController::class, 'update']); // Mettre à jour un menu
+        Route::delete('{id}', [PrestationController::class, 'destroy']); // Supprimer un menu
+    });
+});
