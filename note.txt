@@ -1,5 +1,5 @@
 
-php artisan serve --host 192.168.1.7 --port 8000
+php artisan serve --host 192.168.1.26 --port 8000
 
 -Créons nos tables:
     php artisan make:migration create_roles_table
@@ -72,3 +72,32 @@ composer require twilio/sdk
 
 lsof -i :8000
 kill -9 9255 9256 9257 9258
+
+
+server {
+    listen 80;
+    server_name tabiroo.com;
+
+    root /var/www/html/tabiroo-backend/public;
+    index index.php index.html;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php8.2-fpm.sock;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+
+    access_log /var/log/nginx/tabiroo-backend_access.log;
+    error_log /var/log/nginx/tabiroo-backend_error.log;
+}
+
+sudo ln -s /etc/nginx/sites-available/tabiroo-backend /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx

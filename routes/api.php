@@ -69,3 +69,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('{id}', [PrestationController::class, 'destroy']); // Supprimer un menu
     });
 });
+
+Route::get('/test', function (Request $request) {
+    return response()->json(['message' => 'Test réussi'], 200);
+});
