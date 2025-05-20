@@ -59,6 +59,16 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class, 'role_id');
     }
 
+    public function adresse()
+    {
+        return $this->hasOne(Adresse::class);
+    }
+
+    public function bancaire()
+    {
+        return $this->hasOne(Bancaire::class);
+    }
+
     public function prestations()
     {
         return $this->hasMany(Prestation::class);

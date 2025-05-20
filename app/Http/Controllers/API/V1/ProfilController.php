@@ -7,6 +7,7 @@ use App\Models\Adresse;
 use App\Models\Bancaire;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 
@@ -15,6 +16,8 @@ class ProfilController extends Controller
 {
     public function updateAdresse(Request $request)
     {
+        // $userAuth = Auth::user();
+
         try {
             $validateUser = Validator::make($request->all(), [
                 'id' => 'required|exists:adresses,id'

@@ -27,9 +27,12 @@ Route::post("/reset-password", [AuthController::class, "resetPassword"]);
 Route::post("/auth/google", [AuthController::class, "googleAuth"]);
 Route::post("/auth/apple", [AuthController::class, "appleAuth"]);
 
-Route::post("/update-profile", [AuthController::class, "updateProfile"]);
 
-Route::post("/update-adresse", [ProfilController::class, "updateAdresse"]);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post("/update-profile", [AuthController::class, "updateProfile"]);
+    Route::post("/update-adresse", [ProfilController::class, "updateAdresse"]);
+});
+
 Route::post("/update-bancaire", [ProfilController::class, "updateBancaire"]);
 Route::post("/desactive-compte", [ProfilController::class, "desactiveCompte"]);
 Route::delete("/destroy-compte/{id}", [ProfilController::class, "destroy"]);

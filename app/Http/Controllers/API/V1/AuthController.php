@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Validator;
 use Twilio\Rest\Client;
 use Firebase\JWT\JWT;
 use Firebase\JWT\JWK;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -103,6 +104,7 @@ class AuthController extends Controller
                 ->when($request->phone, function ($query) use ($request) {
                     $query->where('phone', $request->phone);
                 })
+                ->with(['adresse', 'bancaire'])
                 ->first();
 
             if (!$user || !Hash::check($request->password, $user->password)) {
@@ -120,10 +122,14 @@ class AuthController extends Controller
                 'token' => $token,
                 'user' => [
                     'id' => $user->id,
+                    'photo_url' => $user->photo_url,
                     'firstNameOrPseudo' => $user->firstNameOrPseudo,
                     'lastName' => $user->lastName,
                     'email' => $user->email,
                     'phone' => $user->phone,
+                    'biographie' => $user->biographie,
+                    'adresse' => $user->adresse,
+                    'bancaire' => $user->bancaire,
                 ],
             ], 200);
 
@@ -447,11 +453,13 @@ class AuthController extends Controller
 
     public function updateProfile(Request $request)
     {
+
+        $userAuth = Auth::user();
+
         try {
             $validateUser = Validator::make($request->all(), [
-                'id' => 'required|exists:users,id',
-                'phone' => 'nullable|string|unique:users,phone|required_without:email',
-                'email' => 'nullable|string|unique:users,email|required_without:phone',
+                'phone' => 'nullable|string|required_without:email',
+                'email' => 'nullable|string|required_without:phone',
             ]);
 
             if ($validateUser->fails()) {
@@ -462,7 +470,7 @@ class AuthController extends Controller
                 ], 422);
             }
 
-            $user = User::find($request->id);
+            $user = User::find($userAuth->id);
 
             if (!$user) {
                 return response()->json([
@@ -472,24 +480,25 @@ class AuthController extends Controller
             }
 
             $fileName = null;
-            // if ($user->photo_url) {
-            //     $oldPath = public_path('uploads/profiles/' . $user->photo_url);
-            //     if (file_exists($oldPath)) {
-            //         unlink($oldPath);
-            //     }
-            // }
 
-            // if ($request->hasFile('photo_url')) {
-            //     $file = $request->file('photo_url');
-            //     $fileName = time() . '_' . $file->getClientOriginalName();
+            if ($user->photo_url) {
+                $oldPath = public_path('uploads/profile/' . $user->photo_url);
+                if (file_exists($oldPath)) {
+                    unlink($oldPath);
+                }
+            }
+
+            if ($request->hasFile('photo_url')) {
+                $file = $request->file('photo_url');
+                $fileName = time() . '_' . $file->getClientOriginalName();
                 
-            //     $path = public_path('uploads/profiles');
-            //     if (!file_exists($path)) {
-            //         mkdir($path, 0777, true);
-            //     }
+                $path = public_path('uploads/profile');
+                if (!file_exists($path)) {
+                    mkdir($path, 0777, true);
+                }
 
-            //     $file->move($path, $fileName);
-            // }
+                $file->move($path, $fileName);
+            }
 
             $user->update([
                 'firstNameOrPseudo' => $request->firstNameOrPseudo,

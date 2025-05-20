@@ -1,5 +1,5 @@
 
-php artisan serve --host 192.168.1.26 --port 8000
+php artisan serve --host 192.168.1.33 --port 8000
 
 -Créons nos tables:
     php artisan make:migration create_roles_table
@@ -73,31 +73,88 @@ composer require twilio/sdk
 lsof -i :8000
 kill -9 9255 9256 9257 9258
 
+<VirtualHost *:80>
+    ServerAdmin webmaster@tabiroo.com
+    ServerName tabiroo.com
+    ServerAlias www.tabiroo.com
+    DocumentRoot /var/www/tabiroo-backend/public
 
-server {
-    listen 80;
-    server_name tabiroo.com;
+    <Directory /var/www/tabiroo-backend/public>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
 
-    root /var/www/html/tabiroo-backend/public;
-    index index.php index.html;
+    ErrorLog ${APACHE_LOG_DIR}/tabiroo_error.log
+    CustomLog ${APACHE_LOG_DIR}/tabiroo_access.log combined
+</VirtualHost>
 
-    location / {
-        try_files $uri $uri/ /index.php?$query_string;
-    }
-
-    location ~ \.php$ {
-        include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/run/php/php8.2-fpm.sock;
-    }
-
-    location ~ /\.ht {
-        deny all;
-    }
-
-    access_log /var/log/nginx/tabiroo-backend_access.log;
-    error_log /var/log/nginx/tabiroo-backend_error.log;
-}
 
 sudo ln -s /etc/nginx/sites-available/tabiroo-backend /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
+
+sudo chown -R www-data:www-data /var/www/html/tabiroo-backend
+sudo chmod -R 775 /var/www/html/tabiroo-backend/storage /var/www/html/tabiroo-backend/bootstrap/cache
+
+sudo apt install certbot python3-certbot-nginx -y
+sudo certbot --nginx -d tabiroo.com
+
+dig www.tabiroo.com +short
+dig tabiroo.com +short
+
+sudo nano /etc/apache2/sites-available/tabiroo.conf
+
+<VirtualHost *:80>
+    ServerName tabiroo.com
+    ServerAlias www.tabiroo.com
+    DocumentRoot /var/www/html/tabiroo-backend/public
+
+    <Directory /var/www/html/tabiroo-backend/public>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/tabiroo_error.log
+    CustomLog ${APACHE_LOG_DIR}/tabiroo_access.log combined
+RewriteEngine on
+RewriteCond %{SERVER_NAME} =www.tabiroo.com [OR]
+RewriteCond %{SERVER_NAME} =tabiroo.com
+RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+</VirtualHost>
+
+sudo a2ensite tabiroo.conf
+sudo a2enmod rewrite
+sudo systemctl reload apache2
+sudo systemctl restart apache2
+
+<VirtualHost *:80>
+    ServerName www.tabiroo.com
+    ServerAlias 146.59.230.22
+    DocumentRoot /var/www/html/tabiroo-backend/public
+    <Directory /var/www/html/tabiroo-backend>
+        AllowOverride All
+        Require all granted
+    </Directory>
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+RewriteEngine on
+RewriteCond %{SERVER_NAME} =www.tabiroo.com [OR]
+RewriteCond %{SERVER_NAME} =146.59.230.22
+RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+</VirtualHost>
+
+
+sudo chown -R ubuntu /var/www/html/tabiroo-backend/
+sudo chown -R ubuntu /var/www/html/tabiroo-backend/storage
+sudo chown -R ubuntu /var/www/html/tabiroo-backend/bootstrap/cache
+
+
+sudo chmod -R 775 /var/www/html/tabiroo-backend
+sudo chown -R www-data:www-data /var/www/html/tabiroo-backend
+sudo chmod -R 755 /var/www/html/tabiroo-backend
+
+sudo chown -R www-data /var/www/html/tabiroo-backend/storage
+sudo chown -R www-data /var/www/html/tabiroo-backend/bootstrap/cache
+
