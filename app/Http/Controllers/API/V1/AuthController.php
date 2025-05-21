@@ -454,9 +454,9 @@ class AuthController extends Controller
     public function updateProfile(Request $request)
     {
 
-        $userAuth = Auth::user();
+        $user = Auth::user();
 
-        if (!$userAuth) {
+        if (!$user) {
             return response()->json([
                 'status' => false,
                 'message' => 'Utilisateur non authentifié.',
@@ -476,7 +476,7 @@ class AuthController extends Controller
                 ], 422);
             }
 
-            $user = User::find($userAuth->id);
+            $user = User::find($user->id);
 
             if (!$user) {
                 return response()->json([
