@@ -454,14 +454,19 @@ class AuthController extends Controller
     public function updateProfile(Request $request)
     {
 
-        $user = Auth::user();
+        // $user = Auth::user();
 
-        if (!$user) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Utilisateur non authentifié.',
-            ]);
+        // if (!$user) {
+        //     return response()->json([
+        //         'status' => false,
+        //         'message' => 'Utilisateur non authentifié.',
+        //     ]);
+        // }
+
+        if (!Auth::check()) {
+            return false;
         }
+
         try {
             $validateUser = Validator::make($request->all(), [
                 'phone' => 'nullable|string|required_without:email',
@@ -476,7 +481,7 @@ class AuthController extends Controller
                 ], 422);
             }
 
-            $user = User::find($user->id);
+            $user = User::find(1);
 
             if (!$user) {
                 return response()->json([
