@@ -456,6 +456,12 @@ class AuthController extends Controller
 
         $userAuth = Auth::user();
 
+        if (!$userAuth) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Utilisateur non authentifié.',
+            ]);
+        }
         try {
             $validateUser = Validator::make($request->all(), [
                 'phone' => 'nullable|string|required_without:email',
