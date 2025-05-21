@@ -463,9 +463,9 @@ class AuthController extends Controller
         //     ]);
         // }
 
-        if (!Auth::check()) {
+        // if (!Auth::check()) {
             return false;
-        }
+        // }
 
         try {
             $validateUser = Validator::make($request->all(), [
