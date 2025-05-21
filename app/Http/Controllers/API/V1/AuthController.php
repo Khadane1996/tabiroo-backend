@@ -526,6 +526,13 @@ class AuthController extends Controller
             //     'user' => $user
             // ], 200);
 
+             if (!Auth::check()) {
+                return response()->json([
+                            'status' => false,
+                            'message' => 'Utilisateur non authentifié.',
+                        ]);
+            }
+
             return response()->json([
                 'status' => true,
                 'message' => 'Profil mis à jour avec succès',
