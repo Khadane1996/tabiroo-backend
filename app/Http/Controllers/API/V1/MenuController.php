@@ -14,7 +14,9 @@ class MenuController extends Controller
 {
     public function index()
     {
+        $user = Auth::user();
         $menus = Menu::with('plats')
+        ->where('user_id', $user->id)
         ->orderBy('id', 'desc')
         ->get();
 

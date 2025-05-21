@@ -69,27 +69,6 @@ composer require twilio/sdk
 
 ->php artisan config:clear
 
-
-lsof -i :8000
-kill -9 9255 9256 9257 9258
-
-<VirtualHost *:80>
-    ServerAdmin webmaster@tabiroo.com
-    ServerName tabiroo.com
-    ServerAlias www.tabiroo.com
-    DocumentRoot /var/www/tabiroo-backend/public
-
-    <Directory /var/www/tabiroo-backend/public>
-        Options Indexes FollowSymLinks
-        AllowOverride All
-        Require all granted
-    </Directory>
-
-    ErrorLog ${APACHE_LOG_DIR}/tabiroo_error.log
-    CustomLog ${APACHE_LOG_DIR}/tabiroo_access.log combined
-</VirtualHost>
-
-
 sudo ln -s /etc/nginx/sites-available/tabiroo-backend /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl reload nginx
@@ -158,3 +137,16 @@ sudo chmod -R 755 /var/www/html/tabiroo-backend
 sudo chown -R www-data /var/www/html/tabiroo-backend/storage
 sudo chown -R www-data /var/www/html/tabiroo-backend/bootstrap/cache
 
+2. Sur le VPS
+(Optionnel) Si tu veux conserver les fichiers d’uploads actuels en local sur le VPS, fais d’abord une copie de sauvegarde :
+
+bash
+Copier
+Modifier
+sudo -u www-data cp -r /var/www/html/tabiroo-backend/public/uploads /var/www/html/../uploads-backup
+Récupère la dernière version du dépôt (en tant que www-data) :
+
+bash
+Copier
+Modifier
+sudo -u www-data git -C /var/www/html/tabiroo-backend pull
