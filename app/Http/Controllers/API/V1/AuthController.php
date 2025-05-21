@@ -464,66 +464,71 @@ class AuthController extends Controller
         // }
 
         // if (!Auth::check()) {
-            return false;
+        //     return false;
         // }
 
         try {
-            $validateUser = Validator::make($request->all(), [
-                'phone' => 'nullable|string|required_without:email',
-                'email' => 'nullable|string|required_without:phone',
-            ]);
+            // $validateUser = Validator::make($request->all(), [
+            //     'phone' => 'nullable|string|required_without:email',
+            //     'email' => 'nullable|string|required_without:phone',
+            // ]);
 
-            if ($validateUser->fails()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Erreur de validation',
-                    'errors' => $validateUser->errors(),
-                ], 422);
-            }
+            // if ($validateUser->fails()) {
+            //     return response()->json([
+            //         'status' => false,
+            //         'message' => 'Erreur de validation',
+            //         'errors' => $validateUser->errors(),
+            //     ], 422);
+            // }
 
-            $user = User::find(1);
+            // $user = User::find(1);
 
-            if (!$user) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Utilisateur non trouvé',
-                ], 404);
-            }
+            // if (!$user) {
+            //     return response()->json([
+            //         'status' => false,
+            //         'message' => 'Utilisateur non trouvé',
+            //     ], 404);
+            // }
 
-            $fileName = null;
+            // $fileName = null;
 
-            if ($user->photo_url) {
-                $oldPath = public_path('uploads/profile/' . $user->photo_url);
-                if (file_exists($oldPath)) {
-                    unlink($oldPath);
-                }
-            }
+            // if ($user->photo_url) {
+            //     $oldPath = public_path('uploads/profile/' . $user->photo_url);
+            //     if (file_exists($oldPath)) {
+            //         unlink($oldPath);
+            //     }
+            // }
 
-            if ($request->hasFile('photo_url')) {
-                $file = $request->file('photo_url');
-                $fileName = time() . '_' . $file->getClientOriginalName();
+            // if ($request->hasFile('photo_url')) {
+            //     $file = $request->file('photo_url');
+            //     $fileName = time() . '_' . $file->getClientOriginalName();
                 
-                $path = public_path('uploads/profile');
-                if (!file_exists($path)) {
-                    mkdir($path, 0777, true);
-                }
+            //     $path = public_path('uploads/profile');
+            //     if (!file_exists($path)) {
+            //         mkdir($path, 0777, true);
+            //     }
 
-                $file->move($path, $fileName);
-            }
+            //     $file->move($path, $fileName);
+            // }
 
-            $user->update([
-                'firstNameOrPseudo' => $request->firstNameOrPseudo,
-                'lastName' => $request->lastName,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'biographie' => $request->biographie,
-                'photo_url' => $fileName
-            ]);
+            // $user->update([
+            //     'firstNameOrPseudo' => $request->firstNameOrPseudo,
+            //     'lastName' => $request->lastName,
+            //     'email' => $request->email,
+            //     'phone' => $request->phone,
+            //     'biographie' => $request->biographie,
+            //     'photo_url' => $fileName
+            // ]);
+
+            // return response()->json([
+            //     'status' => true,
+            //     'message' => 'Profil mis à jour avec succès',
+            //     'user' => $user
+            // ], 200);
 
             return response()->json([
                 'status' => true,
                 'message' => 'Profil mis à jour avec succès',
-                'user' => $user
             ], 200);
 
         } catch (\Throwable $th) {
