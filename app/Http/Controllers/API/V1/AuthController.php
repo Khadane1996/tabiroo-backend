@@ -451,17 +451,17 @@ class AuthController extends Controller
         }
     }
 
-    public function updateProfile(Request $request)
+    public function updateProfile(Request $request, $id)
     {
 
-        $user = Auth::user();
+        // $user = Auth::user();
 
-        if (!$user) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Utilisateur non authentifié.',
-            ]);
-        }
+        // if (!$user) {
+        //     return response()->json([
+        //         'status' => false,
+        //         'message' => 'Utilisateur non authentifié.',
+        //     ]);
+        // }
         try {
             $validateUser = Validator::make($request->all(), [
                 'phone' => 'nullable|string|required_without:email',
@@ -476,7 +476,7 @@ class AuthController extends Controller
                 ], 422);
             }
 
-            $user = User::find($user->id);
+            $user = User::find($id);
 
             if (!$user) {
                 return response()->json([

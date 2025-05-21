@@ -29,7 +29,7 @@ Route::post("/auth/apple", [AuthController::class, "appleAuth"]);
 
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post("/update-profile", [AuthController::class, "updateProfile"]);
+    Route::post("/update-profile/{id}", [AuthController::class, "updateProfile"]);
     Route::post("/update-adresse", [ProfilController::class, "updateAdresse"]);
 });
 
