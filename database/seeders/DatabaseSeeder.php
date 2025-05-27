@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
-        // Role::factory()->count(3)->create();
+        Role::factory()->count(3)->create();
 
         $this->call(TypeDePlatSeeder::class);
         $this->call(TypeDeCuisineSeeder::class);
