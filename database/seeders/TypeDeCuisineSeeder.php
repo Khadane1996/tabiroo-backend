@@ -15,16 +15,30 @@ class TypeDeCuisineSeeder extends Seeder
     {
         {
             $types = [
-                'Cuisine africaine',
-                'Cuisine asiatique',
-                'Cuisine européenne',
-                'Cuisine américaine',
-                'Cuisine indienne',
-                'Cuisine italienne',
-                'Cuisine sénégalaise',
-                'Cuisine méditerranéenne',
-                'Cuisine orientale',
-                'Cuisine fusion',
+                'Française',
+                'Terroirs',
+                'Méditerranéenne',
+                'Italienne',
+                'Orientale',
+                'Marocaine',
+                'Libanaise',
+                'Africaine',
+                'Sénégalaise',
+                'Ivoirienne',
+                'Antillaise',
+                'Créole',
+                'Asiatique',
+                'Chinoise',
+                'Thaïlandaise',
+                'Vietnamienne',
+                'Japonaise',
+                'Coréenne',
+                'Indienne',
+                'Américaine',
+                'Mexicaine',
+                'Turque',
+                'Réunionnaise',
+                'Fusion'
             ];
     
             foreach ($types as $desc) {

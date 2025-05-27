@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
         $this->call(TypeDeCuisineSeeder::class);
         $this->call(RegimeAlimentaireSeeder::class);
         $this->call(ThemeCulinaireSeeder::class);
+        $this->call(TypeDeRepasTableSeeder::class);
         
     }
 }

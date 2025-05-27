@@ -12,7 +12,7 @@ class Prestation extends Model
 
     protected $fillable = [
         'user_id',
-        'type_de_plat',
+        'type_de_repas',
         'start_time',
         'end_time',
         'date_limite',
@@ -30,9 +30,9 @@ class Prestation extends Model
         return $this->belongsToMany(Menu::class);
     }
 
-    public function typeDePlat()
+    public function typeDeRepas()
     {
-        return $this->belongsTo(TypeDePlat::class, 'type_de_plat');
+        return $this->belongsTo(TypeDeRepas::class, 'type_de_repas');
     }
     
     public function prestations()

@@ -62,6 +62,7 @@ Route::get("/type-plat", [DataSeedController::class, "typePlat"]);
 Route::get("/type-cuisine", [DataSeedController::class, "typeCuisine"]);
 Route::get("/regime-alimentaire", [DataSeedController::class, "regimeAlimentaire"]);
 Route::get("/theme-culinaire", [DataSeedController::class, "themeCulinaire"]);
+Route::get("/type-repas", [DataSeedController::class, "typeRepas"]);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('prestations')->group(function () {

@@ -13,7 +13,7 @@ class PrestationController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $prestations = Prestation::with(['menus', 'typeDePlat'])
+        $prestations = Prestation::with(['menus', 'typeDeRepas'])
             ->where('user_id', $user->id)
             ->get();
 
@@ -35,7 +35,7 @@ class PrestationController extends Controller
         // Exemple : "2025-05-01T00:00:00.000Z" => "2025-05-01"
         $date = \Carbon\Carbon::parse($request->date_prestation)->toDateString();
 
-        $prestations = Prestation::with(['menus', 'typeDePlat'])
+        $prestations = Prestation::with(['menus', 'typeDeRepas'])
             ->where('user_id', $user->id)
             ->whereDate('date_prestation', $date)
             ->get();
@@ -53,7 +53,7 @@ class PrestationController extends Controller
         try {
 
             $validate = Validator::make($request->all(), [
-                'type_de_plat' => 'required|exists:types_de_plat,id',
+                'type_de_repas' => 'required|exists:types_de_repas,id',
                 'start_time' => 'required|string',
                 'end_time' => 'required|string',
                 'date_limite' => 'required|string',
@@ -75,7 +75,7 @@ class PrestationController extends Controller
 
             $prestation = Prestation::create([
                 'user_id' => $user->id,
-                'type_de_plat' => $request->type_de_plat,
+                'type_de_repas' => $request->type_de_repas,
                 'start_time' => $request->start_time,
                 'end_time' => $request->end_time,
                 'date_limite' => $request->date_limite,
@@ -85,7 +85,7 @@ class PrestationController extends Controller
 
             $prestation->menus()->attach($request->menus);
 
-            $data = Prestation::with(['menus', 'typeDePlat'])
+            $data = Prestation::with(['menus', 'typeDeRepas'])
                 ->where('id', $prestation->id)
                 ->get();
                 
@@ -115,7 +115,7 @@ class PrestationController extends Controller
         }
 
         $validate = Validator::make($request->all(), [
-            'type_de_plat' => 'sometimes|exists:types_de_plat,id',
+            'type_de_repas' => 'sometimes|exists:types_de_repas,id',
             'start_time' => 'sometimes|string',
             'end_time' => 'sometimes|string',
             'date_limite' => 'sometimes|string',
@@ -134,7 +134,7 @@ class PrestationController extends Controller
         }
 
         $prestation->update($request->only([
-            'type_de_plat', 'start_time', 'end_time', 'date_limite',
+            'type_de_repas', 'start_time', 'end_time', 'date_limite',
             'heure_arrivee_convive', 'date_prestation'
         ]));
 
@@ -145,14 +145,14 @@ class PrestationController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Prestation mise à jour avec succès',
-            'data' => $prestation->load(['menus', 'typeDePlat'])
+            'data' => $prestation->load(['menus', 'typeDeRepas'])
         ]);
     }
 
     public function show($id)
     {
         $user = Auth::user();
-        $prestation = Prestation::with(['menus', 'typeDePlat'])
+        $prestation = Prestation::with(['menus', 'typeDeRepas'])
             ->where('user_id', $user->id)
             ->find($id);
 

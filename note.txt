@@ -1,5 +1,5 @@
 
-php artisan serve --host 192.168.1.33 --port 8000
+php artisan serve --host 192.168.1.8 --port 8000
 
 -Créons nos tables:
     php artisan make:migration create_roles_table
@@ -11,6 +11,7 @@ php artisan serve --host 192.168.1.33 --port 8000
 	php artisan make:migration create_types_de_cuisine_table
 	php artisan make:migration create_regimes_alimentaire_table
 	php artisan make:migration create_themes_culinaire_table
+	php artisan make:migration create_types_de_repas_table
 
 	php artisan make:migration create_plats_table
 	php artisan make:migration create_menus_table
@@ -29,6 +30,7 @@ php artisan serve --host 192.168.1.33 --port 8000
 	php artisan make:model TypeDeCuisine
 	php artisan make:model RegimeAlimentaire
 	php artisan make:model ThemeCulinaire
+	php artisan make:model TypeDeRepas
 
 	php artisan make:model Plat
 	php artisan make:model Menu
@@ -37,6 +39,7 @@ php artisan serve --host 192.168.1.33 --port 8000
 
 -Créons une classe seeder pour la table roles:
 	php artisan make:seeder RolesTableSeeder
+	php artisan make:seeder TypeDeRepasTableSeeder
 
 -Créons des factory
 	php artisan make:factory RoleFactory --model=Role

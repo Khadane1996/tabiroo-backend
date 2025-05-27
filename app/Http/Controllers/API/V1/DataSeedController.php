@@ -75,4 +75,21 @@ class DataSeedController extends Controller
             ], 500);
         }
     }
+
+    public function typeRepas()
+    {
+        try {
+            $typeDeRepas = DB::table('types_de_repas')->get();
+
+            return response()->json([
+                'status' => true,
+                'data' => $typeDeRepas
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Une erreur est survenue : ' . $th->getMessage(),
+            ], 500);
+        }
+    }
 }

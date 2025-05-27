@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\TypeDePlat;
+use App\Models\TypeDeRepas;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class TypeDePlatSeeder extends Seeder
+class TypeDeRepasTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -14,14 +14,15 @@ class TypeDePlatSeeder extends Seeder
     public function run(): void
     {
         $types = [
-            'Entrée',
-            'Plat principal',
-            'Dessert'
+            'Brunch',
+            'Déjeuner',
+            'Pause gourmande',
+            'Dîner'
         ];
 
         foreach ($types as $desc) {
-            if (!TypeDePlat::where('description', $desc)->exists()) {
-                TypeDePlat::create([
+            if (!TypeDeRepas::where('description', $desc)->exists()) {
+                TypeDeRepas::create([
                     'description' => $desc
                 ]);
             }

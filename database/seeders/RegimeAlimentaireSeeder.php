@@ -15,15 +15,17 @@ class RegimeAlimentaireSeeder extends Seeder
     {
         $regimes = [
             'Végétarien',
-            'Végétalien',
-            'Sans gluten',
+            'Végan',
             'Halal',
             'Casher',
+            'Sans gluten',
             'Sans lactose',
-            'Paléo',
+            'Faible en sucre',
+            'Faible en sel',
+            'Hyper protéiné',
             'Keto',
-            'Flexitarien',
-            'Diabétique',
+            'Dukan',
+            'Sportif'
         ];
 
         foreach ($regimes as $desc) {
