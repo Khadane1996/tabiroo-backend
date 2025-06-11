@@ -162,3 +162,21 @@ php artisan route:clear
 php artisan config:clear
 php artisan cache:clear
 php artisan route:list
+
+i.diaby@outlook.com 3 $2y$12$mYq49ew9T/1A1Q2ve7YoIu0ZNJh9y10mvSSOfd285njgqrjvi6TA6 2025-05-27 02:21:19 2025-05-27 02:21:19
+781311030 ligrejutsu96@gmail.com 2 $2y$12$1q9NdPQbBXTatLVPgW2ZqueGsmiJnu4A8jUEkahA.6mDS1wjSTzl6 2025-05-27 15:29:06 2025-05-27 19:29:08
+
+- sudo -i -u postgres
+- psql
+- SELECT pg_terminate_backend(pid)
+	FROM pg_stat_activity
+	WHERE datname = 'dbxtabiroo' AND pid <> pg_backend_pid();
+DROP DATABASE dbxtabiroo;
+\q
+
+
+- Se connecter au serveur postgres : sudo -i -u postgres
+- psql
+- DROP DATABASE dbxtabiroo;
+- CREATE DATABASE dbxtabiroo;
+- ALTER DATABASE dbxtabiroo OWNER TO postgres;
