@@ -18,6 +18,10 @@ class Prestation extends Model
         'date_limite',
         'heure_arrivee_convive',
         'date_prestation',
+        'ambianceanimation_id',
+        'description_ambiance',
+        'hashtags',
+        'nombre_convive'
     ];
 
     public function user()
@@ -38,5 +42,10 @@ class Prestation extends Model
     public function prestations()
     {
         return $this->hasMany(Prestation::class, 'type_de_plat');
+    }
+
+    public function ambianceAnimation()
+    {
+        return $this->belongsTo(AmbianceAnimation::class, 'ambianceanimation_id');
     }
 }

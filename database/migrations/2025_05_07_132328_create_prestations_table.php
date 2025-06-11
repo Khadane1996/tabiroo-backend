@@ -20,6 +20,10 @@ return new class extends Migration
             $table->string('date_limite');
             $table->string('heure_arrivee_convive');
             $table->string('date_prestation');
+            $table->foreignId('ambianceanimation_id')->nullable()->constrained('ambianceanimations')->onDelete('set null');
+            $table->text('description_ambiance')->nullable();
+            $table->text('hashtags')->nullable();
+            $table->integer("nombre_convive")->default('0')->nullable();
             $table->timestamps();
         });
     }

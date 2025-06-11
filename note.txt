@@ -1,11 +1,12 @@
 
-php artisan serve --host 192.168.1.8 --port 8000
+php artisan serve --host 192.168.10.16 --port 8000
 
 -Créons nos tables:
     php artisan make:migration create_roles_table
 	php artisan make:migration create_adresses_table
 	php artisan make:migration create_bancaires_table
 	php artisan make:migration create_portefeuilles_table
+	php artisan make:migration create_ambianceanimations_table
 
 	php artisan make:migration create_types_de_plat_table
 	php artisan make:migration create_types_de_cuisine_table
@@ -31,6 +32,7 @@ php artisan serve --host 192.168.1.8 --port 8000
 	php artisan make:model RegimeAlimentaire
 	php artisan make:model ThemeCulinaire
 	php artisan make:model TypeDeRepas
+	php artisan make:model AmbianceAnimation
 
 	php artisan make:model Plat
 	php artisan make:model Menu
@@ -40,6 +42,7 @@ php artisan serve --host 192.168.1.8 --port 8000
 -Créons une classe seeder pour la table roles:
 	php artisan make:seeder RolesTableSeeder
 	php artisan make:seeder TypeDeRepasTableSeeder
+	php artisan make:seeder AmbianceAnimationsTableSeeder
 
 -Créons des factory
 	php artisan make:factory RoleFactory --model=Role
@@ -155,3 +158,7 @@ Modifier
 sudo -u www-data git -C /var/www/html/tabiroo-backend pull
 
 
+php artisan route:clear
+php artisan config:clear
+php artisan cache:clear
+php artisan route:list

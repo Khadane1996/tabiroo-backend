@@ -114,6 +114,13 @@ class AuthController extends Controller
                 ], 401);
             }
 
+            if ($user->etat != 1) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Votre compte est inactif',
+                ], 403);
+            }
+
             $token = $user->createToken("auth_token")->plainTextToken;
 
             return response()->json([

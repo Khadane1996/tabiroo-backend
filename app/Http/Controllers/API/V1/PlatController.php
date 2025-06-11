@@ -18,7 +18,7 @@ class PlatController extends Controller
             'typeDePlat',
             'typeDeCuisine',
             'regimeAlimentaire',
-            'themeCulinaire',
+            // 'themeCulinaire',
         ])
         ->where('user_id', $user->id)
         ->orderBy('id', 'desc')
@@ -47,7 +47,7 @@ class PlatController extends Controller
                 'type_de_plat_id' => 'nullable|exists:types_de_plat,id',
                 'type_de_cuisine_id' => 'nullable|exists:types_de_cuisine,id',
                 'regime_alimentaire_id' => 'nullable|exists:regimes_alimentaire,id',
-                'theme_culinaire_id' => 'nullable|exists:themes_culinaire,id',
+                // 'theme_culinaire_id' => 'nullable|exists:themes_culinaire,id',
                 'photo_url' => 'nullable|file|mimes:jpg,jpeg,png,heic|max:4096',
             ]);
 
@@ -120,7 +120,7 @@ class PlatController extends Controller
                 'typeDePlat',
                 'typeDeCuisine',
                 'regimeAlimentaire',
-                'themeCulinaire'
+                // 'themeCulinaire'
             ])->find($id);
 
             if (!$plat) {
@@ -154,7 +154,7 @@ class PlatController extends Controller
                 'type_de_plat_id' => 'nullable|exists:types_de_plat,id',
                 'type_de_cuisine_id' => 'nullable|exists:types_de_cuisine,id',
                 'regime_alimentaire_id' => 'nullable|exists:regimes_alimentaire,id',
-                'theme_culinaire_id' => 'nullable|exists:themes_culinaire,id',
+                // 'theme_culinaire_id' => 'nullable|exists:themes_culinaire,id',
                 'photo_url' => 'nullable|file|mimes:jpg,jpeg,png,heic|max:4096',
             ]);
 
@@ -195,7 +195,7 @@ class PlatController extends Controller
                 'type_de_plat_id' => $request->type_de_plat_id ?? $plat->type_de_plat_id,
                 'type_de_cuisine_id' => $request->type_de_cuisine_id ?? $plat->type_de_cuisine_id,
                 'regime_alimentaire_id' => $request->regime_alimentaire_id ?? $plat->regime_alimentaire_id,
-                'theme_culinaire_id' => $request->theme_culinaire_id ?? $plat->theme_culinaire_id,
+                // 'theme_culinaire_id' => $request->theme_culinaire_id ?? $plat->theme_culinaire_id,
             ]);
 
             return response()->json([

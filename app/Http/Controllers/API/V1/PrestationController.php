@@ -81,6 +81,10 @@ class PrestationController extends Controller
                 'date_limite' => $request->date_limite,
                 'heure_arrivee_convive' => $request->heure_arrivee_convive,
                 'date_prestation' => $request->date_prestation,
+                'ambianceanimation_id' => $request->ambianceanimation_id,
+                'description_ambiance' => $request->description_ambiance,
+                'hashtags' => $request->hashtags,
+                'nombre_convive' => $request->nombre_convive
             ]);
 
             $prestation->menus()->attach($request->menus);

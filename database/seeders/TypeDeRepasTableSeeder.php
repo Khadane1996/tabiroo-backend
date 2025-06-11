@@ -14,17 +14,31 @@ class TypeDeRepasTableSeeder extends Seeder
     public function run(): void
     {
         $types = [
-            'Brunch',
-            'Déjeuner',
-            'Pause gourmande',
-            'Dîner'
+            [
+                'description' => 'Brunch',
+                'start_time' => '09:00',
+                'end_time' => '13:00',
+            ],
+            [
+                'description' => 'Déjeuner',
+                'start_time' => '11:00',
+                'end_time' => '15:00',
+            ],
+            [
+                'description' => 'Pause gourmande',
+                'start_time' => '15:00',
+                'end_time' => '18:00',
+            ],
+            [
+                'description' => 'Dîner',
+                'start_time' => '18:00',
+                'end_time' => '02:00',
+            ],
         ];
 
-        foreach ($types as $desc) {
-            if (!TypeDeRepas::where('description', $desc)->exists()) {
-                TypeDeRepas::create([
-                    'description' => $desc
-                ]);
+        foreach ($types as $type) {
+            if (!TypeDeRepas::where('description', $type['description'])->exists()) {
+                TypeDeRepas::create($type);
             }
         }
     }

@@ -92,4 +92,21 @@ class DataSeedController extends Controller
             ], 500);
         }
     }
+
+    public function ambianceAnimations()
+    {
+        try {
+            $ambianceAnimations = DB::table('ambianceanimations')->get();
+
+            return response()->json([
+                'status' => true,
+                'data' => $ambianceAnimations
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Une erreur est survenue : ' . $th->getMessage(),
+            ], 500);
+        }
+    }
 }
