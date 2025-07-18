@@ -55,6 +55,8 @@ php artisan serve --host 192.168.10.16 --port 8000
 	php artisan make:controller API/V1/DataSeedController
 	php artisan make:controller API/V1/PrestationController
 
+	php artisan make:controller API/V1/Client/Controller
+
 
 
 'token' => $user->createToken("API TOKEN")->plainTextToken
@@ -174,9 +176,13 @@ i.diaby@outlook.com 3 $2y$12$mYq49ew9T/1A1Q2ve7YoIu0ZNJh9y10mvSSOfd285njgqrjvi6T
 DROP DATABASE dbxtabiroo;
 \q
 
+CREATE DATABASE dbxtabiroo OWNER postgres;
 
-- Se connecter au serveur postgres : sudo -i -u postgres
-- psql
-- DROP DATABASE dbxtabiroo;
-- CREATE DATABASE dbxtabiroo;
-- ALTER DATABASE dbxtabiroo OWNER TO postgres;
+
+
+psql dbxtabiroo < /Users/khalifasidibe/Desktop/DataBases\ posgres/dbxtabiroo.sql
+psql dbxagridigibox < /Users/khalifasidibe/Desktop/DataBases\ posgres/dbxagridigibox.sql
+psql dbxentreprendar < /Users/khalifasidibe/Desktop/DataBases\ posgres/dbxentreprendar.sql
+psql dbxkomkomboxai < /Users/khalifasidibe/Desktop/DataBases\ posgres/dbxkomkomboxai.sql
+psql dbxsenlinkpro < /Users/khalifasidibe/Desktop/DataBases\ posgres/dbxsenlinkpro.sql
+psql dbxtech-ecommerce < /Users/khalifasidibe/Desktop/DataBases\ posgres/dbxtech-ecommerce.sql
