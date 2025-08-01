@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('complementAdresse')->nullable();
             $table->string('codePostal')->nullable();
             $table->string('ville')->nullable();
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
             $table->timestamps();
         });
     }

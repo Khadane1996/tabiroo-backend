@@ -8,6 +8,10 @@ use App\Http\Controllers\API\V1\PrestationController;
 use App\Http\Controllers\API\V1\ProfilController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\V1\Client\AllPrestationController;
+use App\Http\Controllers\API\V1\Client\ReservationController;
+use App\Http\Controllers\API\V1\Client\AvisClientController;
+
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -78,3 +82,19 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('/test', function (Request $request) {
     return response()->json(['message' => 'Test réussi'], 200);
 });
+
+// Route::prefix('client')->group(function () {
+//     Route::get("/all-prestations", [AllPrestationController::class, "index"]);
+// });
+
+Route::prefix('client')->group(function () {
+    Route::get("/all-prestations", [AllPrestationController::class, "index"]);
+    Route::get("/plats/{id}", [AllPrestationController::class, "getPlats"]);
+    Route::post("/reservation", [ReservationController::class, "store"]);
+    Route::post("/reservation/update/{id}", [ReservationController::class, "update"]);
+    Route::get("/reservation/{user_id}", [ReservationController::class, "index"]);
+
+    Route::get("/avis-client", [AvisClientController::class, "index"]);
+    Route::post("/avis-client", [AvisClientController::class, "store"]);
+});
+

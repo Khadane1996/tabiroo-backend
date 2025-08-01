@@ -1,0 +1,176 @@
+.hero{
+    height: 437px !important;
+}
+
+.contact-form {
+    position: relative;
+    margin-top: -8%; 
+    padding: 50px;
+    background-color: #FFFFFF;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 642px;
+    height: 820px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 100px;
+    font-family: 'Inter', sans-serif;
+    z-index: 1; 
+}
+.contact-form h3{
+    text-align: center;
+    color: #333A42;
+    font-weight: 400;
+    margin-bottom: 42px;
+}
+
+.form-group {
+    margin-bottom: 28px;
+}
+
+.form-group label {
+    font-size: 16px;
+    color: #333A42;
+    display: block;
+    margin-bottom: 12px;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 542px;
+    padding: 20px;
+    font-size: 16px;
+    border-radius: 15px;
+    border: 1px solid #ccc;
+    background-color: #F3F4F4;
+    outline: none;
+}
+
+input:focus, 
+select:focus, 
+textarea:focus {
+    background-color: #DFE5EC;
+    outline: none;
+}
+
+.form-group select{
+    width: 582px;
+}
+.form-group span{
+    color: #DD6600;
+    font-size: 20px;
+}
+
+
+.form-group textarea {
+    min-height: 100px;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Style du bouton envoyer */
+.btn-submit {
+    display: inline-block;
+    background-color: #DD6600;
+    color: white;
+    padding: 15px 20px;
+    border: none;
+    border-radius: 20px;
+    width: 100%;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-submit:hover {
+    background-color: black;
+}
+
+select option:disabled {
+    color: gray;
+}
+
+.select-wrapper {
+    position: relative;
+}
+
+.contact-form select {
+    border: 1px solid #ccc;
+    font-size: 16px;
+    color: #333; 
+    cursor: pointer;
+}
+
+.contact-form select:focus {
+    outline: none;
+}
+
+
+/* Style de l'overlay */
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3); /* Opacité réduite à 0.3 */
+    display: none; /* Masqué par défaut */
+    z-index: 1000; /* Assurez-vous que c'est inférieur au menu déroulant */
+}
+
+.custom-select-container {
+    position: relative;
+    z-index: 1001; /* Supérieur à l'overlay */
+}
+
+.custom-select {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    cursor: pointer;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.custom-select-trigger {
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f0f0f0;
+    color: #333;
+    border-radius: 5px;
+}
+
+.custom-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    display: none;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    z-index: 1001;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.custom-option {
+    padding: 10px;
+    background-color: white;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.custom-option:hover {
+    background-color: #f0f0f0;
+}
+
+.custom-select.open .custom-options {
+    display: block;
+}

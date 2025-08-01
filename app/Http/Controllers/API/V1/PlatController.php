@@ -38,7 +38,8 @@ class PlatController extends Controller
 
             $user = Auth::user();
 
-            $validate = Validator::make($request->all(),
+            $validate = Validator::make(
+                array_merge($request->all(), $request->allFiles()),
             [
                 'nom' => 'required|string|max:255',
                 'bioPlat' => 'required|string|max:255',

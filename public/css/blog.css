@@ -1,0 +1,96 @@
+.blog{
+    margin: 10% !important;
+}
+.blog h1{
+    text-align: start;
+}
+.blog-hero{
+    background-image: url('../images/blog-her.svg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    border-radius: 30px; 
+    height: 656px; 
+    display: flex;
+    position: relative;
+    color: white;
+    margin-top: 15px;
+}
+.blog-hero h1{
+    position: absolute;
+    left: 5%;
+    bottom: 14%;
+}
+.blog-hero p {
+    position: absolute;
+    left: 5%; 
+    bottom: 5%;
+    margin: 0;
+    text-align: left;
+}
+
+.blog-hero p {
+    font-size: 20px;
+    font-family: "Inter", sans-serif;
+    font-weight: 200;
+}
+
+.third{
+    width: 100% !important;
+}
+
+.third h1{
+    text-align: start !important;
+    margin: 0 !important;
+}
+
+.third button{
+    color: #1B0D00 !important;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding-top: 50px;
+    margin: auto;
+}
+
+.pagination button, 
+.pagination span {
+    border: none;
+    background: #f0f0f0; 
+    font-size: 18px;
+    color: #333;
+    cursor: pointer;
+    padding: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pagination .active {
+    background-color: #DD6600 !important; 
+    color: white !important;
+}
+
+.pagination button:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+    background: #f0f0f0; 
+
+}
+
+.pagination span {
+    cursor: default;
+    background: none;
+}
+
+.pagination .prev-page, 
+.pagination .next-page {
+    font-size: 30px;
+    padding-bottom: 21px; 
+    background: #f0f0f0;
+}

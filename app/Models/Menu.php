@@ -32,7 +32,10 @@ class Menu extends Model
 
     public function prestations()
     {
-        return $this->belongsToMany(Prestation::class);
+        return $this->belongsToMany(Prestation::class, 'menu_prestation')
+            ->withPivot('id') // ici on ajoute le pivot id
+            ->with('typeDeRepas'); // pour charger la relation `typeDeRepas` du modèle Prestation
     }
+
     
 }

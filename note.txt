@@ -1,5 +1,5 @@
 
-php artisan serve --host 192.168.10.16 --port 8000
+php artisan serve --host 192.168.10.38 --port 8000
 
 -Créons nos tables:
     php artisan make:migration create_roles_table
@@ -20,6 +20,9 @@ php artisan serve --host 192.168.10.16 --port 8000
 
 	php artisan make:migration create_prestations_table
 	php artisan make:migration create_menu_prestation_table
+	php artisan make:migration create_reservations_table
+	php artisan make:migration create_notifications_table
+	php artisan make:migration create_avis_clients_table
 
 
 -Créons son model:
@@ -33,11 +36,15 @@ php artisan serve --host 192.168.10.16 --port 8000
 	php artisan make:model ThemeCulinaire
 	php artisan make:model TypeDeRepas
 	php artisan make:model AmbianceAnimation
+	php artisan make:model AvisClient
+	
 
 	php artisan make:model Plat
 	php artisan make:model Menu
 
 	php artisan make:model Prestation
+	php artisan make:model Reservation
+	php artisan make:model Notification
 
 -Créons une classe seeder pour la table roles:
 	php artisan make:seeder RolesTableSeeder
@@ -55,9 +62,10 @@ php artisan serve --host 192.168.10.16 --port 8000
 	php artisan make:controller API/V1/DataSeedController
 	php artisan make:controller API/V1/PrestationController
 
-	php artisan make:controller API/V1/Client/Controller
-
-
+	php artisan make:controller API/V1/Client/AllPrestationController
+	php artisan make:controller API/V1/Client/ReservationController
+	php artisan make:controller API/V1/Client/NotificationController
+	php artisan make:controller API/V1/Client/AvisClientController
 
 'token' => $user->createToken("API TOKEN")->plainTextToken
 
