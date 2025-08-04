@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\V1\Client;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Models\AvisClient;
 
@@ -11,15 +12,15 @@ class AvisClientController extends Controller
 
     public function index($menu_id)
     {
-        $reservations = AvisClient::with('client')
-        ->where('$menu_i', $menu_id)
+        $avis = AvisClient::with('client')
+        ->where('menu_id', $menu_id)
         ->orderBy('id', 'desc')
         ->get();
 
         return response()->json([
             'status' => true,
-            'message' => 'Liste de mes reservations',
-            'data' => $reservations
+            'message' => 'Liste des avis client',
+            'data' => $avis
         ]);
     }
 

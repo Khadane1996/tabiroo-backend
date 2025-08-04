@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\V1\Client\AllPrestationController;
 use App\Http\Controllers\API\V1\Client\ReservationController;
 use App\Http\Controllers\API\V1\Client\AvisClientController;
+use App\Http\Controllers\API\V1\TableauBordController;
 
 
 Route::get('/user', function (Request $request) {
@@ -94,7 +95,14 @@ Route::prefix('client')->group(function () {
     Route::post("/reservation/update/{id}", [ReservationController::class, "update"]);
     Route::get("/reservation/{user_id}", [ReservationController::class, "index"]);
 
-    Route::get("/avis-client", [AvisClientController::class, "index"]);
+    Route::get("/avis-client/{menu_id}", [AvisClientController::class, "index"]);
     Route::post("/avis-client", [AvisClientController::class, "store"]);
+
+    Route::get("/reservation-chef/{user_id}", [ReservationController::class, "getReservationForChef"]);
+
+    Route::get("/notifications/{user_id}", [ReservationController::class, "getNotication"]);
 });
+
+Route::get("/tableau-bord/{user_id}", [TableauBordController::class, "index"]);
+
 

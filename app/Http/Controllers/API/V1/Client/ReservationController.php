@@ -110,4 +110,32 @@ class ReservationController extends Controller
         }
     }
 
+    public function getReservationForChef($user_id)
+    {
+        $reservations = Reservation::with('menuPrestation.prestation.typeDeRepas','client')
+        ->where('chef_id', $user_id)
+        ->orderBy('id', 'desc')
+        ->get();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Liste de mes reservations',
+            'data' => $reservations
+        ]);
+    }
+
+    public function getNotication($user_id)
+    {
+        $notifications = Notification::with('user')
+        ->where('user_id', $user_id)
+        ->orderBy('id', 'desc')
+        ->get();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Liste de mes notifications',
+            'data' => $notifications
+        ]);
+    }
+
 }

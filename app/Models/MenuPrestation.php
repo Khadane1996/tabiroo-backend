@@ -20,4 +20,14 @@ class MenuPrestation extends Model
         return $this->belongsTo(Menu::class);
     }
 
+    public function prestation()
+    {
+        return $this->belongsTo(Prestation::class);
+    }
+
+    public function typeDeRepas()
+    {
+        return $this->belongsTo(TypeDeRepas::class);
+    }
+
 }

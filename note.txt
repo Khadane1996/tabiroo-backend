@@ -66,6 +66,7 @@ php artisan serve --host 192.168.10.38 --port 8000
 	php artisan make:controller API/V1/Client/ReservationController
 	php artisan make:controller API/V1/Client/NotificationController
 	php artisan make:controller API/V1/Client/AvisClientController
+	php artisan make:controller API/V1/TableauBordController
 
 'token' => $user->createToken("API TOKEN")->plainTextToken
 
