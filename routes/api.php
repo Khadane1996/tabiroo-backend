@@ -90,6 +90,7 @@ Route::get('/test', function (Request $request) {
 
 Route::prefix('client')->group(function () {
     Route::get("/all-prestations", [AllPrestationController::class, "index"]);
+    Route::get("/mieux-notes-prestations", [AllPrestationController::class, "mieuxNote"]);
     Route::get("/plats/{id}", [AllPrestationController::class, "getPlats"]);
     Route::post("/reservation", [ReservationController::class, "store"]);
     Route::post("/reservation/update/{id}", [ReservationController::class, "update"]);

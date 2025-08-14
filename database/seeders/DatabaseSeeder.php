@@ -21,14 +21,14 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
-        Role::factory()->count(3)->create();
+        // Role::factory()->count(3)->create();
 
-        // $this->call(TypeDePlatSeeder::class);
-        // $this->call(TypeDeCuisineSeeder::class);
-        // $this->call(RegimeAlimentaireSeeder::class);
-        // $this->call(ThemeCulinaireSeeder::class);
-        // $this->call(TypeDeRepasTableSeeder::class);
-        // $this->call(AmbianceAnimationsTableSeeder::class);
+        $this->call(TypeDePlatSeeder::class);
+        $this->call(TypeDeCuisineSeeder::class);
+        $this->call(RegimeAlimentaireSeeder::class);
+        $this->call(ThemeCulinaireSeeder::class);
+        $this->call(TypeDeRepasTableSeeder::class);
+        $this->call(AmbianceAnimationsTableSeeder::class);
         
     }
 }

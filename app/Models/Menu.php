@@ -37,5 +37,10 @@ class Menu extends Model
             ->with('typeDeRepas'); // pour charger la relation `typeDeRepas` du modèle Prestation
     }
 
+    public function avisClients()
+    {
+        return $this->hasMany(AvisClient::class, 'menu_id');
+    }
+
     
 }
