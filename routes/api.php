@@ -48,7 +48,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', [PlatController::class, 'index']);
         Route::post('/', [PlatController::class, 'store']);
         Route::get('/{id}', [PlatController::class, 'show']);
-        Route::put('/{id}', [PlatController::class, 'update']);
+        Route::post('/update/{id}', [PlatController::class, 'update']);
         Route::delete('/{id}', [PlatController::class, 'destroy']);
     });
 });
@@ -58,7 +58,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', [MenuController::class, 'index']); // Récupérer tous les menus
         Route::get('{id}', [MenuController::class, 'show']); // Afficher un menu spécifique
         Route::post('/', [MenuController::class, 'store']); // Créer un menu
-        Route::put('{id}', [MenuController::class, 'update']); // Mettre à jour un menu
+        Route::post('/update/{id}', [MenuController::class, 'update']); // Mettre à jour un menu
         Route::delete('{id}', [MenuController::class, 'destroy']); // Supprimer un menu
     });
 });
@@ -105,5 +105,11 @@ Route::prefix('client')->group(function () {
 });
 
 Route::get("/tableau-bord/{user_id}", [TableauBordController::class, "index"]);
+Route::get("/best-seller-details/{user_id}", [TableauBordController::class, "getBestSellerDetails"]);
+Route::get("/menus-a-la-carte/{user_id}", [TableauBordController::class, "getMenusAlaCarte"]);
+Route::get("/menus-non-commercialises/{user_id}", [TableauBordController::class, "getMenusNonCommercialises"]);
+Route::get("/notes-clients-details/{user_id}", [TableauBordController::class, "getNotesClientsDetails"]);
+Route::get("/ca-details/{user_id}", [TableauBordController::class, "getCaDetails"]);
+Route::get("/debug-best-seller/{user_id}", [TableauBordController::class, "debugBestSeller"]);
 
 

@@ -202,7 +202,7 @@ class PlatController extends Controller
             return response()->json([
                 'status' => true,
                 'message' => 'Plat mis à jour avec succès',
-                'plat' => $plat
+                'plat' => $plat,
             ]);
 
         } catch (\Throwable $th) {

@@ -1,5 +1,5 @@
 
-php artisan serve --host 192.168.1.10 --port 8000
+php artisan serve --host 192.168.1.9 --port 8000
 
 -Créons nos tables:
     php artisan make:migration create_roles_table

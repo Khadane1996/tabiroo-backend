@@ -17,7 +17,8 @@ class AllPrestationController extends Controller
         $perPage         = $request->get('per_page', 10);
         $typeRepasIds    = Arr::wrap($request->get('types_de_repas'));
         $placeDisponible = $request->get('placeDisponible');
-        $mieuxNote       = $request->get('mieuxNote'); // true/false
+        $mieuxNote       = $request->get('mieuxNote');
+        $prix       = $request->get('prix');
 
         $menusQuery = Menu::with([
             'user:id,firstNameOrPseudo,lastName,phone,email,biographie,photo_url',
@@ -34,11 +35,12 @@ class AllPrestationController extends Controller
         }
 
         // Si on veut trier par note moyenne
-        if ($mieuxNote) {
-            $menusQuery
-                ->withAvg('avisClients', 'note_client')
-                ->orderByDesc('avis_clients_avg_note_client');
-        }
+        $menusQuery->withAvg('avisClients', 'note_client');   
+        // if ($mieuxNote) {
+        //     $menusQuery
+        //         ->withAvg('avisClients', 'note_client')
+        //         ->orderByDesc('avis_clients_avg_note_client');
+        // }
 
         // Filtre places disponibles
         if (!is_null($placeDisponible)) {
@@ -55,8 +57,11 @@ class AllPrestationController extends Controller
             });
         }
 
-        // Tri par ID décroissant par défaut
-        $menusQuery->orderBy('id', 'desc');
+        if ($prix) {
+            $menusQuery->orderBy('prix', 'asc');
+        } else {
+            $menusQuery->orderBy('id', 'desc');
+        }
 
         // Pagination
         $menus = $menusQuery->simplePaginate($perPage);
