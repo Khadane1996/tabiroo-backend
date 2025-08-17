@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Twilio\Rest\Client;
 use Firebase\JWT\JWT;
 use Firebase\JWT\JWK;
@@ -19,67 +21,219 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
-   {
+    /**
+     * Durée de vie du cache pour les inscriptions (en minutes)
+     */
+    const REGISTRATION_CACHE_TTL = 15;
+
+    /**
+     * Nettoyer les données d'inscription expirées du cache
+     */
+    private function cleanupExpiredRegistrations()
+    {
+        // Cette méthode peut être appelée périodiquement ou dans un job
+        // Pour l'instant, elle est documentée pour usage futur
+    }
+
+    /**
+     * Renvoi du code OTP pour une inscription en attente
+     */
+    public function resendOtp(Request $request)
+    {
         try {
-            $validateUser = Validator::make($request->all(), 
-            [
-                'phone' => 'nullable|string|unique:users,phone|required_without:email',
-                'email' => 'nullable|string|unique:users,email|required_without:phone',
-                'role_id' => 'required',
-                'password' => 'required',
+            $validate = Validator::make($request->all(), [
+                'email' => 'nullable|string|email|required_without_all:phone,cache_key',
+                'phone' => 'nullable|string|required_without_all:email,cache_key',
+                'cache_key' => 'nullable|string|required_without_all:email,phone',
             ]);
 
-            if($validateUser->fails()){
+            if ($validate->fails()) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'validation error',
-                    'errors' => $validateUser->errors()
-                ], 401);
+                    'message' => 'Erreur de validation',
+                    'errors' => $validate->errors(),
+                ], 422);
             }
+
+            $registrationData = null;
+            $cacheKey = $request->cache_key;
+
+            // Chercher les données dans le cache
+            if ($cacheKey) {
+                $registrationData = Cache::get($cacheKey);
+            } else {
+                $identifier = $request->email ?: $request->phone;
+                $cacheKeys = Cache::get('registration_keys_' . $identifier, []);
+                
+                foreach ($cacheKeys as $key) {
+                    $data = Cache::get($key);
+                    if ($data) {
+                        $registrationData = $data;
+                        $cacheKey = $key;
+                        break;
+                    }
+                }
+            }
+
+            if (!$registrationData) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Aucune inscription en attente trouvée ou session expirée.',
+                ], 404);
+            }
+
+            // Générer un nouveau code
+            $newConfirmationCode = random_int(1000, 9999);
+            $registrationData['confirmation_code'] = $newConfirmationCode;
+
+            // Remettre à jour le cache
+            Cache::put($cacheKey, $registrationData, now()->addMinutes(self::REGISTRATION_CACHE_TTL));
+
+            // Renvoyer le code
+            $view = 'mail.confirm';
+
+            if ($registrationData['email']) {
+                Mail::to($registrationData['email'])->send(new ConfirmRegistrationMail($newConfirmationCode, $view));
+            } else {
+                $this->sendSms($registrationData['phone'], $newConfirmationCode);
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Nouveau code de confirmation envoyé.',
+                'cache_key' => $cacheKey
+            ], 200);
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Une erreur est survenue : ' . $th->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Vérifier le statut d'une inscription en attente
+     */
+    public function checkRegistrationStatus(Request $request)
+    {
+        try {
+            $validate = Validator::make($request->all(), [
+                'cache_key' => 'required|string',
+            ]);
+
+            if ($validate->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Clé de cache requise',
+                    'errors' => $validate->errors(),
+                ], 422);
+            }
+
+            $registrationData = Cache::get($request->cache_key);
+
+            if (!$registrationData) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Session d\'inscription expirée',
+                ], 404);
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Session d\'inscription active',
+                'expires_at' => $registrationData['created_at']->addMinutes(self::REGISTRATION_CACHE_TTL),
+                'email' => $registrationData['email'] ? '***' . substr($registrationData['email'], -10) : null,
+                'phone' => $registrationData['phone'] ? '***' . substr($registrationData['phone'], -4) : null,
+            ], 200);
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Une erreur est survenue : ' . $th->getMessage(),
+            ], 500);
+        }
+    }
+    public function register(Request $request)
+    {
+        try {
+            $validateUser = Validator::make($request->all(), [
+                'phone' => 'nullable|string|unique:users,phone|required_without:email',
+                'email' => 'nullable|string|unique:users,email|required_without:phone',
+                'role_id' => 'required|integer',
+                'password' => 'required|string|min:6',
+                // 'firstNameOrPseudo' => 'required|string|max:255',
+                // 'lastName' => 'nullable|string|max:255',
+            ]);
+
+            if ($validateUser->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Erreur de validation',
+                    'errors' => $validateUser->errors()
+                ], 422);
+            }
+
+            // Vérifier si l'utilisateur existe déjà (même s'il n'est pas confirmé)
+            $existingUser = User::where(function ($query) use ($request) {
+                if ($request->email) {
+                    $query->where('email', $request->email);
+                }
+                if ($request->phone) {
+                    $query->orWhere('phone', $request->phone);
+                }
+            })->first();
+
+            if ($existingUser) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Un compte existe déjà avec ces informations'
+                ], 409);
+            }
+
+            // Générer un code de confirmation
+            $confirmationCode = random_int(1000, 9999);
             
-            $user = User::create([
-                'firstNameOrPseudo' => $request->firstNameOrPseudo,
-                'lastName' => $request->lastName,
+            // Générer une clé unique pour le cache
+            $cacheKey = 'registration_' . ($request->email ?: $request->phone) . '_' . time();
+            
+            // Stocker les données d'inscription dans le cache pour 15 minutes
+            $registrationData = [
+                // 'firstNameOrPseudo' => $request->firstNameOrPseudo,
+                // 'lastName' => $request->lastName,
                 'phone' => $request->phone,
                 'email' => $request->email,
                 'role_id' => $request->role_id,
-                'password' => Hash::make($request->password)
-            ]);
+                'password' => Hash::make($request->password),
+                'confirmation_code' => $confirmationCode,
+                'cache_key' => $cacheKey,
+                'created_at' => now(),
+            ];
 
-            $confirmationCode = random_int(1000, 9999);
-            
-            $user->confirmation_code = $confirmationCode;
-            $user->save();
+            Cache::put($cacheKey, $registrationData, now()->addMinutes(self::REGISTRATION_CACHE_TTL));
 
-            Adresse::create([
-                'user_id' => $user->id
-            ]);
-    
-            Bancaire::create([
-                'user_id' => $user->id
-            ]);
-
+            // Envoyer le code de confirmation
             $view = 'mail.confirm';
 
-            if ($user->email) {
-                Mail::to($user->email)->send(new ConfirmRegistrationMail($confirmationCode, $view));
+            if ($request->email) {
+                Mail::to($request->email)->send(new ConfirmRegistrationMail($confirmationCode, $view));
             } else {
                 $this->sendSms($request->phone, $confirmationCode);
             }
 
             return response()->json([
                 'status' => true,
-                'message' => 'Utilisateur créé avec succès',
+                'message' => 'Code de confirmation envoyé. Veuillez vérifier votre ' . ($request->email ? 'email' : 'SMS'),
+                'cache_key' => $cacheKey, // Optionnel: pour le debug en développement
             ], 200);
 
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => $th->getMessage()
+                'message' => 'Une erreur est survenue : ' . $th->getMessage()
             ], 500);
         }
-   }
+    }
 
    public function login(Request $request)
     {
@@ -151,45 +305,136 @@ class AuthController extends Controller
 
     public function verify(Request $request)
     {
-        $validate = Validator::make($request->all(), [
-            'email' => 'nullable|string|email|required_without:phone',
-            'phone' => 'nullable|string|required_without:email',
-            'confirmation_code' => 'required|string',
-        ]);
+        try {
+            $validate = Validator::make($request->all(), [
+                'email' => 'nullable|string|email|required_without_all:phone,cache_key',
+                'phone' => 'nullable|string|required_without_all:email,cache_key',
+                'cache_key' => 'nullable|string|required_without_all:email,phone',
+                'confirmation_code' => 'required|string',
+            ]);
 
-        if ($validate->fails()) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Erreur de validation',
-                'errors' => $validate->errors(),
-            ], 422);
-        }
+            if ($validate->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Erreur de validation',
+                    'errors' => $validate->errors(),
+                ], 422);
+            }
 
-        $user = User::where(function ($query) use ($request) {
-                if (!empty($request->phone)) {
-                    $query->where('phone', $request->phone);
-                } else {
-                    $query->where('email', $request->email);
+            $registrationData = null;
+            $cacheKey = $request->cache_key;
+
+            // Si cache_key est fourni, l'utiliser directement
+            if ($cacheKey) {
+                $registrationData = Cache::get($cacheKey);
+            } else {
+                // Sinon, chercher dans le cache par email/phone
+                $identifier = $request->email ?: $request->phone;
+                $cacheKeys = Cache::get('registration_keys_' . $identifier, []);
+                
+                foreach ($cacheKeys as $key) {
+                    $data = Cache::get($key);
+                    if ($data && $data['confirmation_code'] == $request->confirmation_code) {
+                        $registrationData = $data;
+                        $cacheKey = $key;
+                        break;
+                    }
                 }
-            })
-            ->where('confirmation_code', $request->confirmation_code)
-            ->first();
+            }
 
-        if (!$user) {
+            if (!$registrationData || $registrationData['confirmation_code'] != $request->confirmation_code) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Code de confirmation incorrect ou expiré.',
+                ], 400);
+            }
+
+            // Vérifier si les identifiants correspondent
+            $identifierMatch = false;
+            if ($request->email && $registrationData['email'] === $request->email) {
+                $identifierMatch = true;
+            } elseif ($request->phone && $registrationData['phone'] === $request->phone) {
+                $identifierMatch = true;
+            } elseif ($request->cache_key) {
+                $identifierMatch = true; // Si cache_key est fourni, on fait confiance
+            }
+
+            if (!$identifierMatch) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Les identifiants ne correspondent pas.',
+                ], 400);
+            }
+
+            // Commencer une transaction pour créer l'utilisateur et ses relations
+            DB::beginTransaction();
+
+            try {
+                // Créer l'utilisateur
+                $user = User::create([
+                    // 'firstNameOrPseudo' => $registrationData['firstNameOrPseudo'],
+                    // 'lastName' => $registrationData['lastName'],
+                    'phone' => $registrationData['phone'],
+                    'email' => $registrationData['email'],
+                    'role_id' => $registrationData['role_id'],
+                    'password' => $registrationData['password'],
+                    'etat' => 1, // Compte confirmé
+                    'email_verified_at' => $registrationData['email'] ? now() : null,
+                ]);
+
+                // Créer l'adresse associée
+                Adresse::create([
+                    'user_id' => $user->id
+                ]);
+
+                // Créer les informations bancaires associées
+                Bancaire::create([
+                    'user_id' => $user->id
+                ]);
+
+                // Supprimer les données du cache
+                Cache::forget($cacheKey);
+
+                // Supprimer aussi la clé de la liste des clés pour cet identifier
+                if (!$request->cache_key) {
+                    $identifier = $request->email ?: $request->phone;
+                    $cacheKeys = Cache::get('registration_keys_' . $identifier, []);
+                    $cacheKeys = array_filter($cacheKeys, function($key) use ($cacheKey) {
+                        return $key !== $cacheKey;
+                    });
+                    
+                    if (empty($cacheKeys)) {
+                        Cache::forget('registration_keys_' . $identifier);
+                    } else {
+                        Cache::put('registration_keys_' . $identifier, $cacheKeys, now()->addMinutes(15));
+                    }
+                }
+
+                DB::commit();
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Compte confirmé et créé avec succès.',
+                    'user' => [
+                        'id' => $user->id,
+                        'firstNameOrPseudo' => $user->firstNameOrPseudo,
+                        'lastName' => $user->lastName,
+                        'email' => $user->email,
+                        'phone' => $user->phone,
+                    ]
+                ], 200);
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }
+
+        } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' => 'Code de confirmation incorrect.',
-            ], 400);
+                'message' => 'Une erreur est survenue : ' . $th->getMessage(),
+            ], 500);
         }
-
-        $user->confirmation_code = null;
-        $user->etat = 1;
-        $user->save();
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Compte confirmé avec succès.',
-        ], 200);
     }
 
     function sendSms($phone, $otp)
@@ -203,6 +448,28 @@ class AuthController extends Controller
             $message = "Votre code de validation est : " . $otp;
     
             $twilio->messages->create($phone, [
+                'from' => $from,
+                'body' => $message
+            ]);
+    
+            return response()->json(['message' => 'SMS envoyé avec succès.'], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    function sendSms2(Request $request)
+    {
+        try {
+            $sid = env('TWILIO_SID');
+            $token = env('TWILIO_TOKEN');
+            $from = env('TWILIO_PHONE');
+    
+            $twilio = new Client($sid, $token);
+            $message = "Votre code de validation est : " . $request->otp;
+    
+            $twilio->messages->create($request->phone, [
                 'from' => $from,
                 'body' => $message
             ]);

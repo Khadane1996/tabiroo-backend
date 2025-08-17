@@ -1,5 +1,8 @@
 
-php artisan serve --host 192.168.1.9 --port 8000
+php artisan serve --host 192.168.1.46 --port 8000
+
+> lsof -i :8000
+> kill -9 $(lsof -ti :8000)
 
 -Créons nos tables:
     php artisan make:migration create_roles_table
@@ -194,3 +197,14 @@ psql dbxentreprendar < /Users/khalifasidibe/Desktop/DataBases\ posgres/dbxentrep
 psql dbxkomkomboxai < /Users/khalifasidibe/Desktop/DataBases\ posgres/dbxkomkomboxai.sql
 psql dbxsenlinkpro < /Users/khalifasidibe/Desktop/DataBases\ posgres/dbxsenlinkpro.sql
 psql dbxtech-ecommerce < /Users/khalifasidibe/Desktop/DataBases\ posgres/dbxtech-ecommerce.sql
+
+
+MAIL_MAILER=smtp
+MAIL_SCHEME=null
+MAIL_HOST=sandbox.smtp.mailtrap.io
+MAIL_PORT=587
+MAIL_USERNAME=f0ced3b83a94b0
+MAIL_PASSWORD=8ea73f6b786afe
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="inuyashakha96@gmail.com"
+MAIL_FROM_NAME="${APP_NAME}"

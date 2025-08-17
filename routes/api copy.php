@@ -25,10 +25,7 @@ Route::post("/login", [AuthController::class, "login"]);
 
 Route::post("/opt", [AuthController::class, "verify"]);
 
-Route::post("/resend-otp", [AuthController::class, "resendOtp"]);
-Route::post("/check-registration-status", [AuthController::class, "checkRegistrationStatus"]);
-
-Route::post("/sms", [AuthController::class, "sendSms2"]);
+Route::post("/sms", [AuthController::class, "sendSms"]);
 
 Route::post("/send-otp-reset-password", [AuthController::class, "sendOtpforResetPassword"]);
 Route::post("/reset-password", [AuthController::class, "resetPassword"]);
