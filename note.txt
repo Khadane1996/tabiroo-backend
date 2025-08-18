@@ -1,5 +1,5 @@
 
-php artisan serve --host 192.168.1.46 --port 8000
+php artisan serve --host 192.168.10.38 --port 8000
 
 > lsof -i :8000
 > kill -9 $(lsof -ti :8000)

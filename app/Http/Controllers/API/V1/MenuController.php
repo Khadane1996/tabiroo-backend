@@ -131,10 +131,14 @@ class MenuController extends Controller
                 $menu->plats()->sync($request->plat_ids); // sync() pour lier les plats
             }
 
+            $data = Menu::with([
+                'plats'
+            ])->where('id', $menu->id)->first();
+
             return response()->json([
                 'status' => true,
                 'message' => 'Menu mis à jour avec succès',
-                'menu' => $menu
+                'menu' => $data
             ]);
         } catch (\Throwable $th) {
             return response()->json([

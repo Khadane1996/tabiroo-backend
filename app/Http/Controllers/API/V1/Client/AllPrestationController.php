@@ -23,7 +23,8 @@ class AllPrestationController extends Controller
         $menusQuery = Menu::with([
             'user:id,firstNameOrPseudo,lastName,phone,email,biographie,photo_url',
             'prestations.typeDeRepas'
-        ]);
+        ])
+        ->whereHas('prestations');
 
         // Si on filtre par type de repas
         if (!empty($typeRepasIds)) {
@@ -111,6 +112,7 @@ class AllPrestationController extends Controller
     // }
 
     public function mieuxNote(Request $request){
+
         $perPage = $request->get('per_page', 10);
         $typeRepasIds = Arr::wrap($request->get('types_de_repas'));
         $placeDisponible = $request->get('placeDisponible');
@@ -119,6 +121,7 @@ class AllPrestationController extends Controller
             'user:id,firstNameOrPseudo,lastName,phone,email,biographie,photo_url',
             'prestations.typeDeRepas'
         ])
+        ->whereHas('prestations')
         ->withAvg('avisClients', 'note_client')  // Calcul de la moyenne des notes
         ->orderBy('avis_clients_avg_note_client', 'asc')  // Tri par moyenne décroissante
         ->orderBy('id', 'desc');
