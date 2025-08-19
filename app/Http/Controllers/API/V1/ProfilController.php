@@ -44,7 +44,9 @@ class ProfilController extends Controller
                 'adresse' => $request->adresse,
                 'complementAdresse' => $request->complementAdresse,
                 'codePostal' => $request->codePostal,
-                'ville' => $request->ville
+                'ville' => $request->ville,
+                'latitude' => $request->latitude,
+                'longitude' => $request->longitude
             ]);
 
             return response()->json([

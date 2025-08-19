@@ -15,7 +15,9 @@ class Adresse extends Model
         'adresse',
         'complementAdresse',
         'codePostal',
-        'ville'
+        'ville',
+        'latitude',
+        'longitude'
     ];
 
     public function user()
