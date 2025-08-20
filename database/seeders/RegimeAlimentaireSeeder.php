@@ -25,7 +25,8 @@ class RegimeAlimentaireSeeder extends Seeder
             'Hyper protéiné',
             'Keto',
             'Dukan',
-            'Sportif'
+            'Sportif',
+            'aucun'
         ];
 
         foreach ($regimes as $desc) {
