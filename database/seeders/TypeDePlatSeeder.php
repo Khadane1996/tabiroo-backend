@@ -14,9 +14,12 @@ class TypeDePlatSeeder extends Seeder
     public function run(): void
     {
         $types = [
+            'Amuse bouche',
             'Entrée',
             'Plat principal',
-            'Dessert'
+            'Fromage',
+            'Dessert',
+            'Boisson'
         ];
 
         foreach ($types as $desc) {

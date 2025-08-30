@@ -38,6 +38,7 @@ class ReservationController extends Controller
                 'frais_service' => 'required|string',
                 'nombre_convive' => 'required|string',
                 'date_prestation' => 'required|string',
+                'choix' => 'required|string',
             ]);
 
             if ($validate->fails()) {
@@ -48,6 +49,11 @@ class ReservationController extends Controller
                 ], 401);
             }
 
+            $status = 'pending';
+            if($request->choix === 'oui') {
+                $status = 'accepted';
+            }
+
             $reservation = Reservation::create([
                 'menu_prestation_id' => $request->menu_prestation_id,
                 'client_id' => $request->client_id,
@@ -56,7 +62,8 @@ class ReservationController extends Controller
                 'frais_service' => $request->frais_service,
                 'nombre_convive' => $request->nombre_convive,
                 'date_prestation' => $request->date_prestation,
-                'transaction_detail' => $request->transaction_detail
+                'transaction_detail' => $request->transaction_detail,
+                'status' => $status
             ]);
 
             Notification::notifyReservation($request->chef_id, $reservation->id);

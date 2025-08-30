@@ -103,24 +103,27 @@
     border-radius: 32px;
     margin: 48px auto 70px auto;
     max-width: 1100px;
-    padding: 0px 55px 112px 50px;
+    padding: 0px 55px 80px 50px;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    min-height: 320px;
+    min-height: 280px;
+    flex-direction: column;
 }
 
 .apps-banner__img {
-    position: absolute;
-    right: -50px;
+    position: relative;
+    right: auto;
     left: auto;
-    top: 40%;
-    transform: translateY(-50%);
+    top: auto;
+    transform: none;
     width: 700px;
     /* max-width: none; */
     height: auto;
     z-index: 1;
     pointer-events: none;
+    order: 2;
+    margin-top: 30px;
 }
 
 .apps-content {
@@ -128,9 +131,10 @@
     z-index: 2;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     width: 100%;
     gap: 48px;
+    order: 1;
 }
 .apps-text h2 {
     color: #fff;
@@ -181,5 +185,250 @@
     }
     .apps-text h2 {
         font-size: 1.2rem;
+    }
+}
+
+/* ===== RESPONSIVE - PAGE FAQ ===== */
+
+/* Desktop Large */
+@media (min-width: 1200px) {
+    /* Styles pour écrans très larges */
+}
+
+/* Desktop */
+@media (max-width: 1199px) and (min-width: 992px) {
+    /* Styles pour écrans desktop */
+}
+
+/* Tablet Large */
+@media (max-width: 991px) and (min-width: 768px) {
+    /* Styles pour tablettes larges */
+}
+
+/* Tablet */
+@media (max-width: 991px) {
+    .faq-banner {
+        height: 280px;
+        margin-top: 100px;
+    }
+    
+    .faq-banner h1 {
+        font-size: 48px;
+        width: 75%;
+    }
+    
+    .faq-section {
+        padding: 70px 0 100px 0;
+    }
+    
+    .faq-container {
+        max-width: 85%;
+        gap: 16px;
+    }
+    
+    .faq-question {
+        font-size: 18px;
+        padding: 18px 28px;
+    }
+    
+    .faq-answer {
+        padding: 0 28px 18px 28px;
+        font-size: 15px;
+    }
+    
+    .faq-apps-banner {
+        margin: 40px auto 60px auto;
+        padding: 40px 35px 80px 35px;
+        min-height: 250px;
+    }
+    
+    .apps-banner__img {
+        width: 500px;
+        right: auto;
+        margin-top: 25px;
+    }
+    
+    .apps-text h2 {
+        font-size: 36px;
+        margin-bottom: 20px;
+    }
+    
+    .apps-links {
+        gap: 15px;
+    }
+    
+    .apps-links img {
+        width: 110px;
+    }
+}
+
+/* Mobile Large */
+@media (max-width: 767px) and (min-width: 576px) {
+    .faq-banner {
+        height: 250px;
+        margin-top: 100px;
+    }
+    
+    .faq-banner h1 {
+        font-size: 36px;
+        width: 80%;
+    }
+    
+    .faq-section {
+        padding: 60px 0 80px 0;
+    }
+    
+    .faq-container {
+        max-width: 90%;
+        gap: 15px;
+    }
+    
+    .faq-question {
+        font-size: 16px;
+        padding: 16px 24px;
+    }
+    
+    .faq-answer {
+        padding: 0 24px 16px 24px;
+        font-size: 14px;
+    }
+    
+    .faq-apps-banner {
+        margin: 30px 14px 50px 14px;
+        padding: 30px 25px 60px 25px;
+        min-height: 220px;
+    }
+    
+    .apps-banner__img {
+        width: 400px;
+        right: auto;
+        margin-top: 20px;
+    }
+    
+    .apps-text h2 {
+        font-size: 28px;
+        margin-bottom: 15px;
+    }
+    
+    .apps-links {
+        gap: 12px;
+    }
+    
+    .apps-links img {
+        width: 100px;
+    }
+}
+
+/* Mobile Medium */
+@media (max-width: 575px) {
+    .faq-banner {
+        height: 200px;
+        margin-top: 100px;
+    }
+    
+    .faq-banner h1 {
+        font-size: 28px;
+        width: 85%;
+    }
+    
+    .faq-section {
+        padding: 40px 0 60px 0;
+    }
+    
+    .faq-container {
+        max-width: 95%;
+        gap: 12px;
+    }
+    
+    .faq-question {
+        font-size: 14px;
+        padding: 14px 20px;
+    }
+    
+    .faq-answer {
+        padding: 0 20px 14px 20px;
+        font-size: 13px;
+    }
+    
+    .faq-apps-banner {
+        margin: 25px 14px 40px 14px;
+        padding: 25px 20px 50px 20px;
+        min-height: 180px;
+    }
+    
+    .apps-banner__img {
+        width: 300px;
+        right: auto;
+        margin-top: 15px;
+    }
+    
+    .apps-text h2 {
+        font-size: 20px;
+        margin-bottom: 12px;
+    }
+    
+    .apps-links {
+        gap: 10px;
+    }
+    
+    .apps-links img {
+        width: 80px;
+    }
+}
+
+/* Mobile Small */
+@media (max-width: 374px) {
+    .faq-banner {
+        height: 180px;
+        margin-top: 100px;
+    }
+    
+    .faq-banner h1 {
+        font-size: 24px;
+        width: 90%;
+    }
+    
+    .faq-section {
+        padding: 30px 0 50px 0;
+    }
+    
+    .faq-container {
+        max-width: 98%;
+        gap: 10px;
+    }
+    
+    .faq-question {
+        font-size: 13px;
+        padding: 12px 16px;
+    }
+    
+    .faq-answer {
+        padding: 0 16px 12px 16px;
+        font-size: 12px;
+    }
+    
+    .faq-apps-banner {
+        margin: 20px 14px 30px 14px;
+        padding: 20px 15px 40px 15px;
+        min-height: 160px;
+    }
+    
+    .apps-banner__img {
+        width: 250px;
+        right: auto;
+        margin-top: 12px;
+    }
+    
+    .apps-text h2 {
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+    
+    .apps-links {
+        gap: 8px;
+    }
+    
+    .apps-links img {
+        width: 70px;
     }
 }

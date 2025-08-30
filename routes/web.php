@@ -42,3 +42,20 @@ Route::get('/faq', function () {
 Route::get('/article-detail', function () {
     return view('article-detail');
 });
+
+// Nouvelles routes pour les pages légales
+Route::get('/terms', function () {
+    return view('terms');
+});
+
+Route::get('/privacy-policy', function () {
+    return view('privacy-policy');
+});
+
+Route::get('/cookies-settings', function () {
+    return view('cookies-settings');
+});
+
+Route::get('/hygiene-security', function () {
+    return view('hygiene-security');
+});

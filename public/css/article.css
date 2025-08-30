@@ -35,6 +35,7 @@
     margin: 0 0 15px 0;
     color: #1B0D00;
     text-align: left;
+    line-height: 1.5;
 }
 
 .meta-article {
@@ -238,5 +239,234 @@
     }
     .suggestion-article, .bloc-saviez-vous {
         min-width: 0;
+    }
+} 
+
+/* ===== RESPONSIVE - PAGE ARTICLE DETAIL ===== */
+
+/* Desktop Large */
+@media (min-width: 1200px) {
+    /* Styles pour écrans très larges */
+    .article-layout {
+        margin: 140px auto 60px auto;
+        gap: 40px;
+    }
+    
+    .titre-article {
+        font-size: 28px;
+    }
+}
+
+/* Desktop */
+@media (max-width: 1199px) and (min-width: 992px) {
+    /* Styles pour écrans desktop */
+    .article-layout {
+        margin: 120px auto 60px auto;
+        gap: 30px;
+    }
+    
+    .titre-article {
+        font-size: 26px;
+    }
+}
+
+/* Tablet Large */
+@media (max-width: 991px) and (min-width: 768px) {
+    /* Styles pour tablettes larges */
+    .article-layout {
+        margin: 100px auto 50px auto;
+        gap: 25px;
+        padding: 0 20px;
+    }
+    
+    .titre-article {
+        font-size: 24px;
+    }
+    
+    .article-sidebar {
+        margin-top: 40px;
+    }
+}
+
+/* Tablet */
+@media (max-width: 991px) {
+    /* Styles pour tablettes */
+    .article-layout {
+        flex-direction: column;
+        margin: 100px auto 40px auto;
+        gap: 20px;
+        padding: 0 15px;
+    }
+    
+    .article-sidebar {
+        flex-direction: column;
+        gap: 20px;
+        margin-top: 30px;
+        min-width: 0;
+    }
+    
+    .suggestion-article {
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+/* Mobile Large */
+@media (max-width: 767px) and (min-width: 576px) {
+    /* Styles pour mobiles larges */
+    .article-layout {
+        margin: 100px 10px 30px 10px;
+        padding: 0 10px;
+    }
+    
+    .article-main {
+        margin-top: 20px;
+    }
+    
+    .titre-article {
+        font-size: 22px;
+    }
+    
+    .meta-article {
+        font-size: 14px;
+        gap: 8px;
+    }
+    
+    .contenu-article {
+        font-size: 16px;
+    }
+    
+    .contenu-article h2 {
+        font-size: 20px;
+    }
+    
+    .article-sidebar {
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 25px;
+    }
+    
+    .suggestion-article {
+        min-width: 0;
+    }
+}
+
+/* Mobile Medium */
+@media (max-width: 575px) {
+    /* Styles pour mobiles moyens */
+    .article-layout {
+        margin: 100px 5px 20px 5px;
+        padding: 0 5px;
+    }
+    
+    .article-main {
+        margin-top: 25px;
+    }
+    
+    .titre-article {
+        font-size: 20px;
+    }
+    
+    .meta-article {
+        font-size: 13px;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    
+    .social-icons {
+        margin-left: 8px;
+    }
+    
+    .social-icons img {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .contenu-article {
+        font-size: 15px;
+        gap: 15px;
+    }
+    
+    .contenu-article h2 {
+        font-size: 18px;
+    }
+    
+    .contenu-article p {
+        margin-bottom: 10px;
+    }
+    
+    .image-article {
+        width: 100%;
+        max-height: 200px;
+        margin-bottom: 20px;
+    }
+    
+    .article-sidebar {
+        gap: 12px;
+        margin-top: 20px;
+    }
+    
+    .suggestion-article h3 {
+        font-size: 16px;
+    }
+    
+    .suggestion-article p {
+        font-size: 14px;
+    }
+    
+    .suggestion-article a {
+        font-size: 14px;
+    }
+}
+
+/* Mobile Small */
+@media (max-width: 320px) {
+    /* Styles pour petits mobiles */
+    .article-layout {
+        margin: 100px 2px 15px 2px;
+        padding: 0 2px;
+    }
+    
+    .article-main {
+        margin-top: 30px;
+    }
+    
+    .titre-article {
+        font-size: 18px;
+    }
+    
+    .meta-article {
+        font-size: 12px;
+    }
+    
+    .contenu-article {
+        font-size: 14px;
+        gap: 12px;
+    }
+    
+    .contenu-article h2 {
+        font-size: 16px;
+    }
+    
+    .image-article {
+        max-height: 150px;
+        margin-bottom: 15px;
+    }
+    
+    .article-sidebar {
+        gap: 10px;
+        margin-top: 15px;
+    }
+    
+    .suggestion-article h3 {
+        font-size: 14px;
+    }
+    
+    .suggestion-article p {
+        font-size: 13px;
+    }
+    
+    .suggestion-article a {
+        font-size: 13px;
     }
 } 

@@ -14,6 +14,7 @@ class PrestationController extends Controller
     {
         $user = Auth::user();
         $prestations = Prestation::with(['menus', 'typeDeRepas'])
+            ->withSum('reservations as reservations_count', 'nombre_convive')
             ->where('user_id', $user->id)
             ->get();
 
@@ -61,6 +62,7 @@ class PrestationController extends Controller
                 'date_prestation' => 'required|string',
                 'menus' => 'required|array',
                 'menus.*' => 'exists:menus,id',
+                'choix' => 'required|string'    
             ]);
 
             if ($validate->fails()) {
@@ -84,7 +86,8 @@ class PrestationController extends Controller
                 'ambianceanimation_id' => $request->ambianceanimation_id,
                 'description_ambiance' => $request->description_ambiance,
                 'hashtags' => $request->hashtags,
-                'nombre_convive' => $request->nombre_convive
+                'nombre_convive' => $request->nombre_convive,
+                'choix' => $request->choix,
             ]);
 
             $prestation->menus()->attach($request->menus);

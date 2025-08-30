@@ -11,18 +11,23 @@
 
     <header>
         <div>
-            <a href="/">
+            <a href="{{ url('/') }}">
                 <img src="{{ asset('images/logo.svg') }}" alt="Logo de Tabiroo" width="132">
             </a>
         </div>
         <nav>
             <ul>
                 <a href="{{ url('/about') }}">À Propos</a>
-                <a href="{{ url('/blog') }}">Blog</a></li>
+                <a href="{{ url('/blog') }}">Blog</a>
                 <a href="{{ url('/contact') }}">Contact</a>
                 <a href="{{ url('/faq') }}">FAQ</a>
             </ul>
         </nav>
+        <div class="hamburger-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
     </header>
 
     <main>
@@ -66,7 +71,7 @@
                                 </div>
                                 <div class="mob">
                                     <img src="{{ asset('images/tabiroo.svg') }}" alt="", class="img-logo">
-                                    <img src="{{ asset('images/X - mockup - white.svg') }}" class="img-mob" alt="">
+                                    <img src="{{ asset('images/proo2.svg') }}" class="img-mob" alt="">
                                 </div>
                             </div>
                         </div>
@@ -81,7 +86,7 @@
                         <div class="bloc-chiffre">
                             <img src="{{ asset('images/uno.svg') }}" alt="">
                             <h3>Explorez</h3>
-                            <p>Sélectionnez une date et<br> trouvez l’expérience culinaire<br> qui vous plaît.</p>
+                            <p>Sélectionnez une date et<br> trouvez l'expérience culinaire<br> qui vous plaît.</p>
                         </div>
                         <img src="{{ asset('images/down.svg') }}" alt="">
                         <div class="bloc-chiffre">
@@ -93,7 +98,7 @@
                         <div class="bloc-chiffre">
                             <img src="{{ asset('images/tres.svg') }}" alt="">
                             <h3>Savourez</h3>
-                            <p>Profitez d’un repas fait maison<br> et d’un moment convivial chez<br> votre hôte.</p>
+                            <p>Profitez d'un repas fait maison<br> et d'un moment convivial chez<br> votre hôte.</p>
                         </div>
                     </div>
                 </div>
@@ -128,7 +133,7 @@
                         <img src="{{ asset('images/article1.svg') }}" alt="">
                         <h3>Lorem ipsum dolor sit.</h3>
                         <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. </p>
-                        <a href="#">Lire l'article</a>
+                        <a href="{{ url('/article-detail') }}">Lire l'article</a>
                     </div>
                     <div class="articles">
                         <img src="{{ asset('images/article2.svg') }}" alt="">
@@ -154,12 +159,12 @@
                 </button>
             </div>
             <div class="four">
-                <h1>Ils ont goûté à l’expérience</h1>
+                <h1>Ils ont goûté à l'expérience</h1>
                 <div class="temoignages-container">
                     <img src="{{ asset('images/left.svg') }}" alt="Précédent" class="prev" />
                     <div class="temoignages">
                         <div class="temoin">
-                            <p>“Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. Lectus volutpat ipsum etiam egestas velit et semper quisque. Eleifend vel egestas neque lacinia cras turpis facilisis vestibulum. Nibh suspendisse lectus urna ullamcorper.” </p>
+                            <p>"Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. Lectus volutpat ipsum etiam egestas velit et semper quisque. Eleifend vel egestas neque lacinia cras turpis facilisis vestibulum. Nibh suspendisse lectus urna ullamcorper." </p>
                             <div class="profil">
                                 <img src="{{ asset('images/pro1.svg') }}" alt="">
                                 <div class="info">
@@ -169,7 +174,7 @@
                             </div>
                         </div>
                         <div class="temoin">
-                            <p>“Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. Lectus volutpat ipsum etiam egestas velit et semper quisque. Eleifend vel egestas neque lacinia cras turpis facilisis vestibulum. Nibh suspendisse lectus urna ullamcorper.” </p>
+                            <p>"Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. Lectus volutpat ipsum etiam egestas velit et semper quisque. Eleifend vel egestas neque lacinia cras turpis facilisis vestibulum. Nibh suspendisse lectus urna ullamcorper." </p>
                             <div class="profil">
                                 <img src="{{ asset('images/pro2.svg') }}" alt="">
                                 <div class="info">
@@ -179,7 +184,7 @@
                             </div>
                         </div>
                         <div class="temoin">
-                            <p>“Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. Lectus volutpat ipsum etiam egestas velit et semper quisque. Eleifend vel egestas neque lacinia cras turpis facilisis vestibulum. Nibh suspendisse lectus urna ullamcorper.” </p>
+                            <p>"Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. Lectus volutpat ipsum etiam egestas velit et semper quisque. Eleifend vel egestas neque lacinia cras turpis facilisis vestibulum. Nibh suspendisse lectus urna ullamcorper." </p>
                             <div class="profil">
                                 <img src="{{ asset('images/pro1.svg') }}" alt="">
                                 <div class="info">
@@ -189,7 +194,7 @@
                             </div>
                         </div>
                         <div class="temoin">
-                            <p>“Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. Lectus volutpat ipsum etiam egestas velit et semper quisque. Eleifend vel egestas neque lacinia cras turpis facilisis vestibulum. Nibh suspendisse lectus urna ullamcorper.” </p>
+                            <p>"Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. Lectus volutpat ipsum etiam egestas velit et semper quisque. Eleifend vel egestas neque lacinia cras turpis facilisis vestibulum. Nibh suspendisse lectus urna ullamcorper." </p>
                             <div class="profil">
                                 <img src="{{ asset('images/pro2.svg') }}" alt="">
                                 <div class="info">
@@ -212,18 +217,18 @@
             <div class="global">
                 <div class="footer-menu">
                     <ul>
-                        <a href="#">Accueil</a>
-                        <a href="#">À Propos</a>
-                        <a href="#">Blog</a>
-                        <a href="#">Contact</a>
+                        <a href="{{ url('/') }}">Accueil</a>
+                        <a href="{{ url('/about') }}">À Propos</a>
+                        <a href="{{ url('/blog') }}">Blog</a>
+                        <a href="{{ url('/contact') }}">Contact</a>
                     </ul>
                 </div>
                 <div class="footer-menu">
                     <ul>
-                        <a href="#">Condition d’utilisation</a>
-                        <a href="#">Politique de confidentialité</a>
-                        <a href="#">Cookies Settings</a>
-                        <a href="#">Hygiène et sécurité</a>
+                        <a href="{{ url('/terms') }}">Condition d'utilisation</a>
+                        <a href="{{ url('/privacy-policy') }}">Politique de confidentialité</a>
+                        <a href="{{ url('/cookies-settings') }}">Cookies Settings</a>
+                        <a href="{{ url('/hygiene-security') }}">Hygiène et sécurité</a>
                     </ul>
                 </div>
             </div>

@@ -29,11 +29,17 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     nextBtn.addEventListener("click", function () {
-        container.scrollBy({ left: cardWidth * 2, behavior: "smooth" });
+        // Vérifier si on est sur mobile (largeur du témoignage = 100%)
+        const isMobile = window.innerWidth <= 767;
+        const scrollAmount = isMobile ? cardWidth : cardWidth * 2;
+        container.scrollBy({ left: scrollAmount, behavior: "smooth" });
     });
 
     prevBtn.addEventListener("click", function () {
-        container.scrollBy({ left: -cardWidth * 2, behavior: "smooth" });
+        // Vérifier si on est sur mobile (largeur du témoignage = 100%)
+        const isMobile = window.innerWidth <= 767;
+        const scrollAmount = isMobile ? cardWidth : cardWidth * 2;
+        container.scrollBy({ left: -scrollAmount, behavior: "smooth" });
     });
 
     container.addEventListener("scroll", updateButtons);
@@ -111,4 +117,35 @@ document.addEventListener('DOMContentLoaded', function() {
             item.classList.toggle('active');
         });
     });
+});
+
+// Menu Hamburger
+
+document.addEventListener('DOMContentLoaded', function() {
+    const hamburger = document.querySelector('.hamburger-menu');
+    const nav = document.querySelector('header nav');
+    
+    if (hamburger && nav) {
+        hamburger.addEventListener('click', function() {
+            hamburger.classList.toggle('active');
+            nav.classList.toggle('active');
+        });
+        
+        // Fermer le menu quand on clique sur un lien
+        const navLinks = nav.querySelectorAll('a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                hamburger.classList.remove('active');
+                nav.classList.remove('active');
+            });
+        });
+        
+        // Fermer le menu quand on clique en dehors
+        document.addEventListener('click', function(e) {
+            if (!hamburger.contains(e.target) && !nav.contains(e.target)) {
+                hamburger.classList.remove('active');
+                nav.classList.remove('active');
+            }
+        });
+    }
 });

@@ -22,7 +22,8 @@ class AllPrestationController extends Controller
 
         $menusQuery = Menu::with([
             'user:id,firstNameOrPseudo,lastName,phone,email,biographie,photo_url',
-            'prestations.typeDeRepas'
+            'prestations.typeDeRepas',
+            'prestations.reservationsConfirmées'
         ])
         ->whereHas('prestations');
 
@@ -74,43 +75,6 @@ class AllPrestationController extends Controller
         ]);
     }
 
-    // public function index(Request $request)
-    // {
-    //     $perPage = $request->get('per_page', 10);
-    //     $typeRepasIds = Arr::wrap($request->get('types_de_repas'));
-    
-    //     $menusQuery = Menu::with([
-    //         'user:id,firstNameOrPseudo,lastName,phone,email,biographie,photo_url',
-    //         'prestations.typeDeRepas'
-    //     ])
-    //     ->orderBy('id', 'desc');
-    
-    //     // Appliquer le filtre uniquement si on a des types_de_repas
-    //     if (!empty($typeRepasIds)) {
-    //         $menusQuery->whereHas('prestations', function ($query) use ($typeRepasIds) {
-    //             $query->whereHas('typeDeRepas', function ($q) use ($typeRepasIds) {
-    //                 $q->whereIn('id', $typeRepasIds);
-    //             });
-    //         })
-    //         ->with(['prestations' => function ($query) use ($typeRepasIds) {
-    //             $query->whereHas('typeDeRepas', function ($q) use ($typeRepasIds) {
-    //                 $q->whereIn('id', $typeRepasIds);
-    //             });
-    //         }]);
-    //     } else {
-    //         // Si pas de filtre, charger simplement toutes les prestations
-    //         $menusQuery->with('prestations');
-    //     }
-    
-    //     $menus = $menusQuery->simplePaginate($perPage);
-    
-    //     return response()->json([
-    //         'status' => true,
-    //         'message' => 'Liste des menus paginée',
-    //         'data' => $menus,
-    //     ]);
-    // }
-
     public function mieuxNote(Request $request){
 
         $perPage = $request->get('per_page', 10);
@@ -119,7 +83,8 @@ class AllPrestationController extends Controller
 
         $menusQuery = Menu::with([
             'user:id,firstNameOrPseudo,lastName,phone,email,biographie,photo_url',
-            'prestations.typeDeRepas'
+            'prestations.typeDeRepas',
+            'prestations.reservationsConfirmées'
         ])
         ->whereHas('prestations')
         ->withAvg('avisClients', 'note_client')  // Calcul de la moyenne des notes
@@ -180,4 +145,5 @@ class AllPrestationController extends Controller
             'data' => $plats,
         ]);
     }
+
 }

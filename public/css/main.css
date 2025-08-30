@@ -61,6 +61,8 @@ nav a.active {
     text-align: center;
     padding: 20px;
     margin-top: 50px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .hero h1 {
@@ -283,6 +285,7 @@ h1{
 
 .third .une{
     display: flex;
+    flex-wrap: wrap;
     gap: 30px;
 }
 
@@ -322,6 +325,7 @@ h1{
     scroll-snap-type: x mandatory;
     overflow: hidden;
     width: 100%; 
+    -webkit-overflow-scrolling: touch;
 }
 
 
@@ -428,6 +432,39 @@ footer .menu{
     opacity: 100%;
 }
 
+/* Menu Hamburger */
+.hamburger-menu {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    width: 25px;
+    height: 20px;
+    justify-content: space-between;
+    z-index: 1001;
+    margin-right: 0;
+}
+
+.hamburger-menu span {
+    display: block;
+    width: 100%;
+    height: 3px;
+    background-color: #333A42;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.hamburger-menu.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger-menu.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger-menu.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -6px);
+}
+
 footer .menu .global{
     display: flex;
     gap: 80px;
@@ -455,6 +492,1002 @@ footer .tabiroo{
     color: #FFFFFF;
     margin-top: 20px;
     border-top: 1px solid white;
+}
+
+/* Page Politique de confidentialité */
+.privacy-content {
+    margin-top: 70px;
+    padding: 60px 0;
+    min-height: calc(100vh - 70px - 300px); /* Ajuster selon la hauteur du footer */
+}
+
+.privacy-container {
+    max-width: 615px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+}
+
+/* Titre principal */
+.privacy-container h1 {
+    font-family: 'JacquesProBold', sans-serif;
+    font-size: 34px;
+    font-weight: 700;
+    color: #1B0D00;
+    margin: 0 0 30px 0;
+}
+
+/* Introduction */
+.privacy-intro {
+    margin-bottom: 40px;
+}
+
+.privacy-intro p {
+    font-family: 'JacquesPro', sans-serif;
+    font-size: 18px;
+    color: #000000;
+    margin: 0;
+    line-height: 1.5;
+}   
+
+/* Sections */
+.privacy-section {
+    margin-bottom: 40px;
+}
+
+.privacy-section h2 {
+    font-family: 'JacquesProBold', sans-serif;
+    font-size: 20px;
+    color: #1B0D00;
+    margin: 0 0 15px 0;
+}
+
+.privacy-section p {
+    font-family: 'JacquesPro', sans-serif;
+    font-size: 18px;
+    color: #000000;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.privacy-section h3 {
+    font-family: 'JacquesProBold', sans-serif;
+    font-size: 18px;
+    color: #1B0D00;
+    margin: 0 0 10px 0;
+}
+
+.privacy-section ul {
+    margin-left: 0;
+    margin-top: 10px;
+    margin-bottom: 0;
+    padding-left: 0;
+    list-style-position: outside;
+}
+
+.privacy-section ul li {
+    font-family: 'JacquesPro', sans-serif;
+    font-size: 16px;
+    color: #000000;
+    line-height: 1.5;
+    margin-bottom: 8px;
+    padding-left: 0;
+    margin-left: 0;
+}
+
+/* Responsive pour la page de politique de confidentialité */
+@media (max-width: 768px) {
+    .privacy-content {
+        padding: 40px 0;
+    }
+    
+    .privacy-container {
+        padding: 0 20px;
+    }
+    
+    .privacy-container h1 {
+        font-size: 2rem;
+        padding-left: 15px;
+    }
+    
+    .privacy-intro,
+    .privacy-section {
+        padding-left: 15px;
+    }
+    
+    .privacy-section h2 {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .privacy-container {
+        padding: 0 15px;
+    }
+    
+    .privacy-container h1 {
+        font-size: 1.8rem;
+        padding-left: 10px;
+    }
+    
+    .privacy-intro,
+    .privacy-section {
+        padding-left: 10px;
+    }
+}
+
+/* ===== RESPONSIVE - PAGE INDEX ===== */
+
+/* Desktop Large (1200px et plus) */
+@media (min-width: 1200px) {
+    
+}
+
+/* Desktop (992px - 1199px) */
+@media (max-width: 1199px) and (min-width: 992px) {
+    
+}
+
+/* Tablet Large (768px - 991px) */
+@media (max-width: 991px) and (min-width: 768px) {
+    
+}
+
+/* Tablet (768px - 991px) */
+@media (max-width: 991px) {
+    
+}
+
+/* Mobile Large (576px - 767px) */
+@media (max-width: 767px) and (min-width: 576px) {
+    /* Header mobile */
+    header {
+        justify-content: space-between;
+        gap: 0;
+        padding: 20px 20px 20px 15px;
+        box-sizing: border-box;
+        width: 100%;
+    }
+    
+    /* Menu Hamburger */
+    .hamburger-menu {
+        display: flex;
+    }
+    
+    header nav {
+        display: none;
+    }
+    
+    header nav.active {
+        display: block;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: white;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px 0;
+    }
+    
+    header nav.active ul {
+        flex-direction: column;
+        gap: 15px;
+        padding: 0 20px;
+    }
+    
+    header nav.active ul a {
+        display: block;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+    }
+    
+    header nav.active ul a:last-child {
+        border-bottom: none;
+    }
+    
+    /* Hero Section */
+    .hero {
+        height: 400px;
+        padding: 20px 15px;
+        margin-top: 92px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .hero h1 {
+        font-size: 42px;
+        width: 90%;
+    }
+    
+    .hero p {
+        font-size: 18px;
+        width: 80%;
+    }
+    
+    /* Boutons de choix */
+    .tab-menu {
+        height: 42px;
+        max-width: 350px;
+        font-size: 13px;
+    }
+    
+    .tab-menu .menu-item {
+        font-size: 15px;
+    }
+    
+    /* H1 "Vous souhaitez" */
+    .container h1 {
+        font-size: 26px;
+    }
+    
+    /* Titre italic et paragraphe des onglets */
+    .container .italic {
+        font-size: 18px;
+    }
+    
+    .tabbed-content p {
+        font-size: 14px;
+    }
+    
+    /* Téléphone seulement */
+    .app-mob .mob .img-mob {
+        width: 80%;
+        max-width: 250px;
+    }
+    
+    .app-mob .mob .img-logo {
+        width: 60px;
+    }
+    
+    /* Pages CGU - Alignement à gauche */
+    .privacy-container {
+        text-align: left;
+    }
+    
+    .privacy-container h1 {
+        text-align: left;
+        font-size: 25px;
+    }
+    
+    .privacy-intro p {
+        text-align: left;
+    }
+    
+    .privacy-section h2 {
+        text-align: left;
+    }
+    
+    .privacy-section h3 {
+        text-align: left;
+    }
+    
+    .privacy-section p {
+        text-align: left;
+    }
+    
+    .privacy-section ul {
+        text-align: left;
+    }
+    
+    .privacy-section ul li {
+        text-align: left;
+    }
+    
+    /* Taille des paragraphes CGU */
+    .privacy-intro p {
+        font-size: 15px;
+    }
+    
+    .privacy-section p {
+        font-size: 15px;
+    }
+    
+    /* Marge réduite pour le titre CGU */
+    .privacy-container h1 {
+        margin: 0 0 15px 0;
+    }
+    
+    /* Ajuster l'espacement et l'alignement */
+    .app-mob {
+        gap: 20px;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .app-mob .link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .app-mob .mob {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Section "Comment ça marche" */
+    .second h1 {
+        font-size: 26px;
+    }
+    
+    /* Énumérations en vertical */
+    .enum .numero {
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+    }
+    
+    /* Masquer seulement les flèches */
+    .enum .numero img[src*="down.svg"],
+    .enum .numero img[src*="up.svg"] {
+        display: none;
+    }
+    
+    /* Taille des images de numérotation */
+    .enum .numero img {
+        width: 40%;
+    }
+    
+    /* Articles en vertical */
+    .third .une {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+    
+    .articles {
+        width: 100%;
+        max-width: 400px;
+    }
+    
+    .articles img {
+        width: 100%;
+        height: auto;
+    }
+    
+    .third button {
+        font-size: 14px;
+        padding: 12px 20px;
+    }
+    
+    .blocs {
+        gap: 25px;
+    }
+    
+    .temoignages-container {
+        margin-top: 20px;
+    }
+    
+    /* Témoignages un par un avec navigation */
+    .temoignages {
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-behavior: smooth;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    
+    .temoignages .temoin {
+        width: 100%;
+        min-width: 100%;
+        margin-right: 0;
+        flex-direction: column-reverse;
+        scroll-snap-align: start;
+    }
+    
+    /* Afficher les flèches de navigation */
+    .prev,
+    .next {
+        display: block;
+        width: 30px;
+        height: auto;
+    }
+    
+    /* Réduire la police des témoignages */
+    .temoin p {
+        font-size: 14px;
+        line-height: 1.4;
+    }
+    
+    .profil .info span {
+        font-size: 14px;
+    }
+    
+    .profil .info p {
+        font-size: 12px;
+    }
+    
+    /* Footer en vertical */
+    footer {
+        height: auto;
+        padding: 30px 20px 0px 20px;
+    }
+    
+    footer .menu {
+        flex-direction: column;
+        align-items: center;
+        gap: 50px;
+    }
+    
+    footer .menu .global {
+        flex-direction: row;
+        gap: 40px;
+        align-items: flex-start;
+        justify-content: center;
+    }
+    
+    /* Enlever le padding-left des menus */
+    .footer-menu ul {
+        padding-left: 0;
+        list-style: none;
+    }
+    
+    /* Réduire la taille des polices et icônes */
+    .footer-menu ul a {
+        font-size: 14px;
+    }
+    
+    footer .link img {
+        width: 120px;
+    }
+    
+    .follow .reseau img {
+        width: 20px;
+        height: 20px;
+    }
+    
+    /* Conteneur global */
+    .container {
+        margin-top: 25px;
+        margin-left: 0;
+        margin-right: 0;
+    }
+    
+    footer .link {
+        margin-top: 40px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+    }
+    
+    footer .tabiroo {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        margin-top: 30px;
+        text-align: center;
+    }
+}
+
+/* Mobile (320px - 575px) */
+@media (max-width: 575px) {
+    /* Header mobile */
+    header {
+        justify-content: space-between;
+        gap: 0;
+        padding: 20px 20px 20px 15px;
+        box-sizing: border-box;
+        width: 100%;
+    }
+    
+    /* Menu Hamburger */
+    .hamburger-menu {
+        display: flex;
+    }
+    
+    header nav {
+        display: none;
+    }
+    
+    header nav.active {
+        display: block;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: white;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px 0;
+    }
+    
+    header nav.active ul {
+        flex-direction: column;
+        gap: 15px;
+        padding: 0 20px;
+    }
+    
+    header nav.active ul a {
+        display: block;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+    }
+    
+    header nav.active ul a:last-child {
+        border-bottom: none;
+    }
+    
+    /* Hero Section */
+    .hero {
+        height: 300px;
+        padding: 15px 10px;
+        margin-top: 92px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .hero h1 {
+        font-size: 26px;
+        width: 95%;
+    }
+    
+    .hero p {
+        font-size: 16px;
+        width: 90%;
+    }
+    
+    /* Boutons de choix */
+    .tab-menu {
+        height: 40px;
+        max-width: 320px;
+        font-size: 12px;
+    }
+    
+    .tab-menu .menu-item {
+        font-size: 14px;
+    }
+    
+    /* H1 "Vous souhaitez" */
+    .container h1 {
+        font-size: 26px;
+    }
+    
+    /* Titre italic et paragraphe des onglets */
+    .container .italic {
+        font-size: 18px;
+    }
+    
+    .tabbed-content p {
+        font-size: 14px;
+    }
+    
+    /* Téléphone seulement */
+    .app-mob .mob .img-mob {
+        width: 70%;
+        max-width: 200px;
+    }
+    
+    .app-mob .mob .img-logo {
+        width: 50px;
+    }
+    
+    /* Ajuster l'espacement et l'alignement */
+    .app-mob {
+        gap: 15px;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .app-mob .link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    .app-mob .mob {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Section "Comment ça marche" */
+    .second h1 {
+        font-size: 26px;
+    }
+    
+    /* Énumérations en vertical */
+    .enum .numero {
+        flex-direction: column;
+        align-items: center;
+        gap: 25px;
+    }
+    
+    /* Masquer seulement les flèches */
+    .enum .numero img[src*="down.svg"],
+    .enum .numero img[src*="up.svg"] {
+        display: none;
+    }
+    
+    /* Taille des images de numérotation */
+    .enum .numero img {
+        width: 40%;
+    }
+    
+    /* Articles en vertical */
+    .third .une {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .articles {
+        width: 100%;
+        max-width: 380px;
+    }
+    
+    .articles img {
+        width: 100%;
+        height: auto;
+    }
+    
+    /* Témoignages un par un avec navigation */
+    .temoignages {
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-behavior: smooth;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    
+    .temoignages .temoin {
+        width: 100%;
+        min-width: 100%;
+        margin-right: 0;
+        flex-direction: column-reverse;
+        scroll-snap-align: start;
+    }
+    
+    /* Afficher les flèches de navigation */
+    .prev,
+    .next {
+        display: block;
+        width: 25px;
+        height: auto;
+    }
+    
+    /* Réduire la police des témoignages */
+    .temoin p {
+        font-size: 13px;
+        line-height: 1.4;
+    }
+    
+    .profil .info span {
+        font-size: 13px;
+    }
+    
+    .profil .info p {
+        font-size: 11px;
+    }
+    
+    /* Footer en vertical */
+    footer {
+        height: auto;
+        padding: 25px 15px 0px 15px;
+    }
+    
+    footer .menu {
+        flex-direction: column;
+        align-items: center;
+        gap: 40px;
+    }
+    
+    footer .menu .global {
+        flex-direction: row;
+        gap: 30px;
+        align-items: flex-start;
+        justify-content: center;
+    }
+    
+    /* Enlever le padding-left des menus */
+    .footer-menu ul {
+        padding-left: 0;
+        list-style: none;
+    }
+    
+    /* Réduire la taille des polices et icônes */
+    .footer-menu ul a {
+        font-size: 13px;
+    }
+    
+    footer .link img {
+        width: 110px;
+    }
+    
+    .follow .reseau img {
+        width: 18px;
+        height: 18px;
+    }
+    
+    /* Conteneur global */
+    .container {
+        margin-top: 25px;
+        margin-left: 0;
+        margin-right: 0;
+    }
+    
+    footer .link {
+        margin-top: 35px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    footer .tabiroo {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        margin-top: 25px;
+        text-align: center;
+    }
+    
+    /* Pages CGU - Alignement à gauche */
+    .privacy-container {
+        text-align: left;
+    }
+    
+    .privacy-container h1 {
+        text-align: left;
+        font-size: 25px;
+    }
+    
+    .privacy-intro p {
+        text-align: left;
+    }
+    
+    .privacy-section h2 {
+        text-align: left;
+    }
+    
+    .privacy-section h3 {
+        text-align: left;
+    }
+    
+    .privacy-section p {
+        text-align: left;
+    }
+    
+    .privacy-section ul {
+        text-align: left;
+    }
+    
+    .privacy-section ul li {
+        text-align: left;
+    }
+    
+    /* Taille des paragraphes CGU */
+    .privacy-intro p {
+        font-size: 15px;
+    }
+    
+    .privacy-section p {
+        font-size: 15px;
+    }
+    
+    /* Marge réduite pour le titre CGU */
+    .privacy-container h1 {
+        margin: 0 0 15px 0;
+    }
+    
+    /* Boutons de choix plus petits pour mobile */
+    .tab-menu {
+        height: 35px;
+        max-width: 280px;
+        font-size: 11px;
+    }
+    
+    .tab-menu .menu-item {
+        font-size: 12px;
+    }
+    
+    /* H1 "Vous souhaitez" */
+    .container h1 {
+        font-size: 26px;
+    }
+    
+    /* Téléphone seulement */
+    .app-mob .mob .img-mob {
+        width: 60%;
+        max-width: 180px;
+    }
+    
+    .app-mob .mob .img-logo {
+        width: 45px;
+    }
+    
+    /* Ajuster l'espacement et l'alignement */
+    .app-mob {
+        gap: 10px;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .app-mob .link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    
+    .app-mob .mob {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Section "Comment ça marche" */
+    .second h1 {
+        font-size: 26px;
+    }
+    
+    /* Énumérations en vertical */
+    .enum .numero {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+    
+    /* Masquer seulement les flèches */
+    .enum .numero img[src*="down.svg"],
+    .enum .numero img[src*="up.svg"] {
+        display: none;
+    }
+    
+    /* Taille des images de numérotation */
+    .enum .numero img {
+        width: 40%;
+    }
+    
+    /* Articles en vertical */
+    .third .une {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .articles {
+        width: 100%;
+        max-width: 350px;
+    }
+    
+    .articles img {
+        width: 100%;
+        height: auto;
+    }
+    
+    .third button {
+        font-size: 14px;
+        padding: 12px 20px;
+    }
+    
+    .blocs {
+        gap: 25px;
+    }
+    
+    .temoignages-container {
+        margin-top: 20px;
+    }
+    
+    /* Témoignages un par un avec navigation */
+    .temoignages {
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-behavior: smooth;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    
+    .temoignages .temoin {
+        width: 100%;
+        min-width: 100%;
+        margin-right: 0;
+        flex-direction: column-reverse;
+        scroll-snap-align: start;
+    }
+    
+    /* Afficher les flèches de navigation */
+    .prev,
+    .next {
+        display: block;
+        width: 20px;
+        height: auto;
+    }
+    
+    /* Réduire la police des témoignages */
+    .temoin p {
+        font-size: 12px;
+        line-height: 1.4;
+    }
+    
+    .profil .info span {
+        font-size: 12px;
+    }
+    
+    .profil .info p {
+        font-size: 10px;
+    }
+    
+    /* Footer en vertical */
+    footer {
+        height: auto;
+        padding: 20px 10px 0px 10px;
+    }
+    
+    footer .menu {
+        flex-direction: column;
+        align-items: center;
+        gap: 35px;
+    }
+    
+    footer .menu .global {
+        flex-direction: row;
+        gap: 20px;
+        align-items: flex-start;
+        justify-content: center;
+    }
+    
+    /* Enlever le padding-left des menus */
+    .footer-menu ul {
+        padding-left: 0;
+        list-style: none;
+    }
+    
+    /* Réduire la taille des polices et icônes */
+    .footer-menu ul a {
+        font-size: 12px;
+    }
+    
+    footer .link img {
+        width: 100px;
+    }
+    
+    .follow .reseau img {
+        width: 16px;
+        height: 16px;
+    }
+    
+    /* Conteneur global */
+    .container {
+        margin-top: 25px;
+        margin-left: 0;
+        margin-right: 0;
+    }
+    
+    footer .link {
+        margin-top: 30px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    footer .tabiroo {
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        margin-top: 20px;
+        text-align: center;
+    }
+}
+
+/* Mobile Small (320px et moins) */
+@media (max-width: 320px) {
+    
 }
 
 

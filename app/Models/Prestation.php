@@ -21,7 +21,8 @@ class Prestation extends Model
         'ambianceanimation_id',
         'description_ambiance',
         'hashtags',
-        'nombre_convive'
+        'nombre_convive',
+        'choix'
     ];
 
     public function user()
@@ -48,4 +49,42 @@ class Prestation extends Model
     {
         return $this->belongsTo(AmbianceAnimation::class, 'ambianceanimation_id');
     }
+
+    public function reservationsConfirmées()
+    {
+        return $this->hasManyThrough(
+            Reservation::class,
+            MenuPrestation::class,
+            'prestation_id', // clé étrangère sur menu_prestation
+            'menu_prestation_id', // clé étrangère sur reservations
+            'id', // clé locale sur prestations
+            'id'  // clé locale sur menu_prestation
+        )->whereIn('status', ['pending', 'accepted']);
+    }
+
+    protected $appends = ['places_restantes'];
+
+    public function getPlacesRestantesAttribute()
+    {
+        $reserved = $this->reservationsConfirmées->sum('nombre_convive');
+        return max($this->nombre_convive - $reserved, 0);
+    }
+
+    public function reservations()
+    {
+        return $this->hasManyThrough(
+            Reservation::class,
+            MenuPrestation::class,
+            'prestation_id',       // FK dans menu_prestations
+            'menu_prestation_id',  // FK dans reservations
+            'id',                  // PK local prestations
+            'id'                   // PK local menu_prestations
+        );
+    }
+
+    public function reservationsConfirméesTwo()
+    {
+        return $this->reservations()->where('status', 'confirmed');
+    }
+
 }

@@ -6,12 +6,11 @@
     <title>FAQ - Tabiroo</title>
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
     <link rel="stylesheet" href="{{ asset('css/faq.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=NomDeLaPolice:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
         <div>
-            <a href="/">
+            <a href="{{ url('/') }}">
                 <img src="{{ asset('images/logo.svg') }}" alt="Logo de Tabiroo" width="132">
             </a>
         </div>
@@ -23,6 +22,11 @@
                 <a href="{{ url('/faq') }}" class="active">FAQ</a>
             </ul>
         </nav>
+        <div class="hamburger-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
     </header>
     <main>
         <section class="faq-banner">
@@ -54,8 +58,8 @@
                     <div class="apps-text">
                         <h2>Nos apps<br>Disponible sur</h2>
                         <div class="apps-links">
-                            <a href="#"><img src="images/Google Play Badge.svg" alt="PlayStore" width="150"></a>
-                            <a href="#"><img src="images/App Store Badge.svg" alt="AppStore" width="150"></a>
+                            <a href="#"><img src="{{ asset('images/Google Play Badge.svg') }}" alt="PlayStore" width="150"></a>
+                            <a href="#"><img src="{{ asset('images/App Store Badge.svg') }}" alt="AppStore" width="150"></a>
                         </div>
                     </div>
                 </div>
@@ -69,41 +73,41 @@
             <div class="global">
                 <div class="footer-menu">
                     <ul>
-                        <a href="#">Accueil</a>
-                        <a href="#">À Propos</a>
-                        <a href="#">Blog</a>
-                        <a href="#">Contact</a>
+                        <a href="{{ url('/') }}">Accueil</a>
+                        <a href="{{ url('/about') }}">À Propos</a>
+                        <a href="{{ url('/blog') }}">Blog</a>
+                        <a href="{{ url('/contact') }}">Contact</a>
                     </ul>
                 </div>
                 <div class="footer-menu">
                     <ul>
-                        <a href="#">Condition d'utilisation</a>
-                        <a href="#">Politique de confidentialité</a>
-                        <a href="#">Cookies Settings</a>
-                        <a href="#">Hygiène et sécurité</a>
+                        <a href="{{ url('/terms') }}">Condition d'utilisation</a>
+                        <a href="{{ url('/privacy-policy') }}">Politique de confidentialité</a>
+                        <a href="{{ url('/cookies-settings') }}">Cookies Settings</a>
+                        <a href="{{ url('/hygiene-security') }}">Hygiène et sécurité</a>
                     </ul>
                 </div>
             </div>
         </div>
         <div class="link">
-            <a href="#"><img src="images/Google Play Badge.svg" alt="PlayStore" width="150"></a>
-            <a href="#"><img src="images/App Store Badge.svg" alt="AppStore" width="150"></a>
+            <a href="#"><img src="{{ asset('images/Google Play Badge.svg') }}" alt="PlayStore" width="150"></a>
+            <a href="#"><img src="{{ asset('images/App Store Badge.svg') }}" alt="AppStore" width="150"></a>
         </div>
         <div class="tabiroo">
             <div class="follow">
                 <p>Suivez-nous</p>
                 <div class="reseau">
                     <a href="#">
-                        <img src="images/insta.svg" alt="">
+                        <img src="{{ asset('images/insta.svg') }}" alt="">
                     </a>
                     <a href="#">
-                        <img src="images/facebook.svg" alt="">
+                        <img src="{{ asset('images/facebook.svg') }}" alt="">
                     </a>
                     <a href="#">
-                        <img src="images/linkedin.svg" alt="">
+                        <img src="{{ asset('images/linkedin.svg') }}" alt="">
                     </a>
                     <a href="#">
-                        <img src="images/x.svg" alt="">
+                        <img src="{{ asset('images/x.svg') }}" alt="">
                     </a>
                 </div>
             </div>
@@ -111,6 +115,5 @@
         </div>
     </footer>
     <script src="{{ asset('js/main.js') }}"></script>
-    <script src="js/faq.js"></script>
 </body>
 </html>

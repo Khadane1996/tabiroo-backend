@@ -12,18 +12,23 @@
 
     <header>
         <div>
-            <a href="/">
+            <a href="{{ url('/') }}">
                 <img src="{{ asset('images/logo.svg') }}" alt="Logo de Tabiroo" width="132">
             </a>
         </div>
         <nav>
             <ul>
-                <a href="{{ url('/about') }}">À Propos</a>
-                <a href="{{ url('/blog') }}" class="active">Blog</a></li>
+                <a href="{{ url('/about') }}" >À Propos</a>
+                <a href="{{ url('/blog') }}" class="active">Blog</a>
                 <a href="{{ url('/contact') }}">Contact</a>
                 <a href="{{ url('/faq') }}">FAQ</a>
             </ul>
         </nav>
+        <div class="hamburger-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
     </header>
 
     <main>
@@ -40,7 +45,7 @@
                         <img src="{{ asset('images/article1.svg') }}" alt="">
                         <h3>Lorem ipsum dolor sit.</h3>
                         <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. </p>
-                        <a href="#">Lire l'article</a>
+                        <a href="{{ url('/article-detail') }}">Lire l'article</a>
                     </div>
                     <div class="articles">
                         <img src="{{ asset('images/article2.svg') }}" alt="">
@@ -156,7 +161,7 @@
             <div class="global">
                 <div class="footer-menu">
                     <ul>
-                        <a href="/">Accueil</a>
+                        <a href="{{ url('/') }}">Accueil</a>
                         <a href="{{ url('/about') }}">À Propos</a>
                         <a href="{{ url('/blog') }}">Blog</a>
                         <a href="{{ url('/contact') }}">Contact</a>
@@ -164,41 +169,40 @@
                 </div>
                 <div class="footer-menu">
                     <ul>
-                        <a href="#">Condition d’utilisation</a>
-                        <a href="#">Politique de confidentialité</a>
-                        <a href="#">Cookies Settings</a>
-                        <a href="#">Hygiène et sécurité</a>
+                        <a href="{{ url('/terms') }}">Condition d'utilisation</a>
+                        <a href="{{ url('/privacy-policy') }}">Politique de confidentialité</a>
+                        <a href="{{ url('/cookies-settings') }}">Cookies Settings</a>
+                        <a href="{{ url('/hygiene-security') }}">Hygiène et sécurité</a>
                     </ul>
                 </div>
             </div>
             
         </div>
         <div class="link">
-            <a href="#"><img src="images/Google Play Badge.svg" alt="PlayStore", width="150"></a>
-            <a href="#"><img src="images/App Store Badge.svg" alt="AppStore", width="150"></a>
+            <a href="#"><img src="{{ asset('images/Google Play Badge.svg') }}" alt="PlayStore", width="150"></a>
+            <a href="#"><img src="{{ asset('images/App Store Badge.svg') }}" alt="AppStore", width="150"></a>
         </div>
         <div class="tabiroo">
             <div class="follow">
                 <p>Suivez-nous</p>
                 <div class="reseau">
                     <a href="#">
-                        <img src="images/insta.svg" alt="">
+                        <img src="{{ asset('images/insta.svg') }}" alt="">
                     </a>
                     <a href="#">
-                        <img src="images/facebook.svg" alt="">
+                        <img src="{{ asset('images/facebook.svg') }}" alt="">
                     </a>
                     <a href="#">
-                        <img src="images/linkedin.svg" alt="">
+                        <img src="{{ asset('images/linkedin.svg') }}" alt="">
                     </a>
                     <a href="#">
-                        <img src="images/x.svg" alt="">
+                        <img src="{{ asset('images/x.svg') }}" alt="">
                     </a>
                 </div>
             </div>
             <p>Tabiroo 2025</p>
         </div>
     </footer>
-    <script src="{{ asset('js/main.js') }}"></script>
 
 </body>
 </html>

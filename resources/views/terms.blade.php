@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tabiroo</title>
-    <link rel="stylesheet" href="{{ asset('css/contact.css') }}">
+    <title>Conditions d'utilisation - Tabiroo</title>
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=NomDeLaPolice:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-
     <header>
         <div>
             <a href="{{ url('/') }}">
@@ -20,7 +18,7 @@
             <ul>
                 <a href="{{ url('/about') }}">À Propos</a>
                 <a href="{{ url('/blog') }}">Blog</a>
-                <a href="{{ url('/contact') }}" class="active">Contact</a>
+                <a href="{{ url('/contact') }}">Contact</a>
                 <a href="{{ url('/faq') }}">FAQ</a>
             </ul>
         </nav>
@@ -31,55 +29,27 @@
         </div>
     </header>
 
-    <main>
-        <div class="hero">
-            <h1>Contact</h1>
+    <main style="margin-top: 100px; padding: 50px;">
+        <div class="container">
+            <h1>Conditions d'utilisation</h1>
+            <div style="max-width: 800px; margin: 0 auto; line-height: 1.6;">
+                <h2>1. Acceptation des conditions</h2>
+                <p>En utilisant la plateforme Tabiroo, vous acceptez d'être lié par ces conditions d'utilisation.</p>
+                
+                <h2>2. Description du service</h2>
+                <p>Tabiroo est une plateforme qui met en relation des hôtes passionnés de cuisine et des convives à la recherche de repas faits maison.</p>
+                
+                <h2>3. Utilisation du service</h2>
+                <p>Vous vous engagez à utiliser le service de manière responsable et à respecter les autres utilisateurs.</p>
+                
+                <h2>4. Responsabilités</h2>
+                <p>Chaque utilisateur est responsable de ses actions et du contenu qu'il publie sur la plateforme.</p>
+                
+                <h2>5. Modifications</h2>
+                <p>Nous nous réservons le droit de modifier ces conditions à tout moment.</p>
+            </div>
         </div>
-
-        <!-- Formulaire de contact -->
-        <section class="contact-form">
-            <h3>Comment pouvons-nous vous aider ?</h3>
-            <form action="" method="POST">
-                @csrf
-                <div class="form-group">
-                    <label for="subject">Objet</label>
-                    <select id="subject" name="subject" required>
-                        <option value="" disabled selected hidden>Sélectionnez un objet</option>
-                        <option value="support">Assistance & Support</option>
-                        <option value="demande">Demande d'information</option>
-                        <option value="partenariat">Collaboration & Partenariats</option>
-                        <option value="media">Presse & Médias</option>
-                        <option value="abus">Signaler un abus</option>
-                        <option value="autre">Autre demande</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="fullname">Nom complet <span>*</span></label>
-                    <input type="text" id="fullname" name="fullname" required placeholder="Entrez votre nom complet">
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Adresse e-mail <span>*</span></label>
-                    <input type="email" id="email" name="email" required placeholder="Entrez votre e-mail">
-                </div>
-
-                <div class="form-group">
-                    <label for="phone">Numéro de téléphone</label>
-                    <input type="tel" id="phone" name="phone" required placeholder="Entrez votre numéro de téléphone">
-                </div>
-
-                <div class="form-group">
-                    <label for="message">Votre message <span>*</span></label>
-                    <textarea id="message" name="message" required placeholder="Message"></textarea>
-                </div>
-
-                <button type="submit" class="btn-submit">Envoyer</button>
-            </form>
-        </section>
     </main>
-    <div id="overlay"></div>
-    <script src="{{ asset('js/main.js') }}"></script>
 
     <footer>
         <div class="menu">
@@ -120,6 +90,6 @@
             <p>Tabiroo 2025</p>
         </div>
     </footer>
-
+    <script src="{{ asset('js/main.js') }}"></script>
 </body>
 </html>
