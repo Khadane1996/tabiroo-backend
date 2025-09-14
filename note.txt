@@ -71,6 +71,8 @@ php artisan serve --host 192.168.1.11 --port 8000
 	php artisan make:controller API/V1/Client/AvisClientController
 	php artisan make:controller API/V1/TableauBordController
 
+	php artisan make:controller API/V1/StripeController
+
 'token' => $user->createToken("API TOKEN")->plainTextToken
 
 
@@ -86,6 +88,9 @@ composer require twilio/sdk
 
 +18148319596
 +221781311030
+
+*** Installation Stripe Connect
+-composer require stripe/stripe-php
 
 ->php artisan config:clear
 

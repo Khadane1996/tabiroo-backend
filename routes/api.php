@@ -12,6 +12,7 @@ use App\Http\Controllers\API\V1\Client\AllPrestationController;
 use App\Http\Controllers\API\V1\Client\ReservationController;
 use App\Http\Controllers\API\V1\Client\AvisClientController;
 use App\Http\Controllers\API\V1\TableauBordController;
+use App\Http\Controllers\StripeController;
 
 
 Route::get('/user', function (Request $request) {
@@ -116,3 +117,11 @@ Route::get("/ca-details/{user_id}", [TableauBordController::class, "getCaDetails
 Route::get("/debug-best-seller/{user_id}", [TableauBordController::class, "debugBestSeller"]);
 
 
+
+Route::prefix('stripe')->group(function () {
+    Route::post('/payment-intent', [StripeController::class, 'createPaymentIntent']);
+    Route::post('/account', [StripeController::class, 'createAccount']);
+    Route::post('/account/link', [StripeController::class, 'createAccountLink']);
+});
+
+Route::post('/stripe/webhook', [StripeController::class, 'handleWebhook']);
