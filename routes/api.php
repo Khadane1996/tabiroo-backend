@@ -97,6 +97,12 @@ Route::prefix('client')->group(function () {
     Route::get("/mieux-notes-prestations", [AllPrestationController::class, "mieuxNote"]);
     Route::get("/plats/{id}", [AllPrestationController::class, "getPlats"]);
     Route::post("/reservation", [ReservationController::class, "store"]);
+    Route::post("/reservation/reserve-and-pay", [ReservationController::class, "reserveAndPay"]) // init reservation + paymentintent
+        ->middleware('auth:sanctum');
+    Route::post("/reservation/cancel-on-payment-fail", [ReservationController::class, "cancelOnPaymentFail"]) // cleanup on payment fail
+        ->middleware('auth:sanctum');
+    Route::get("/reservation/{id}/payment-details", [ReservationController::class, "getPaymentDetails"]) // récupérer les détails de paiement
+    ->middleware('auth:sanctum');
     Route::post("/reservation/update/{id}", [ReservationController::class, "update"]);
     Route::get("/reservation/{user_id}", [ReservationController::class, "index"]);
 
@@ -116,12 +122,29 @@ Route::get("/notes-clients-details/{user_id}", [TableauBordController::class, "g
 Route::get("/ca-details/{user_id}", [TableauBordController::class, "getCaDetails"]);
 Route::get("/debug-best-seller/{user_id}", [TableauBordController::class, "debugBestSeller"]);
 
-
-
 Route::prefix('stripe')->group(function () {
+    // 🔹 Paiement d’un chef
     Route::post('/payment-intent', [StripeController::class, 'createPaymentIntent']);
-    Route::post('/account', [StripeController::class, 'createAccount']);
-    Route::post('/account/link', [StripeController::class, 'createAccountLink']);
+
+    // 🔹 SetupIntent pour enregistrer une carte
+    Route::post('/setup-intent', [StripeController::class, 'createSetupIntent'])
+        ->middleware('auth:sanctum');
+
+    // 🔹 Création du compte Stripe Connect + lien avec le user connecté
+    Route::post('/account', [StripeController::class, 'createAccount'])
+        ->middleware('auth:sanctum'); // ⚡ protège cette route (chef connecté)
+
+    // 🔹 Génération d’un lien d’onboarding
+    Route::post('/account/link', [StripeController::class, 'createAccountLink'])
+        ->middleware('auth:sanctum'); // ⚡ facultatif mais conseillé
+
+    Route::get('/status', [StripeController::class, 'checkAccountStatus'])
+    ->middleware('auth:sanctum');
+    
+    // Vérifier le statut d'un PaymentIntent
+    Route::get('/payment-intent/{id}/status', [StripeController::class, 'checkPaymentStatus'])
+    ->middleware('auth:sanctum');
+    
 });
 
 Route::post('/stripe/webhook', [StripeController::class, 'handleWebhook']);

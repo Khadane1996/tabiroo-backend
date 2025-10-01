@@ -6,8 +6,6 @@ use App\Services\StripeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
-
-
 class StripeController extends Controller
 {
     protected $stripe;
@@ -17,7 +15,9 @@ class StripeController extends Controller
         $this->stripe = $stripe;
     }
 
-    // Créer un PaymentIntent
+    /**
+     * Créer un PaymentIntent
+     */
     public function createPaymentIntent(Request $request)
     {
         $request->validate([
@@ -36,17 +36,30 @@ class StripeController extends Controller
         ]);
     }
 
-    // Créer un compte connect
+    /**
+     * Créer un compte connect et le lier au chef (user)
+     */
     public function createAccount(Request $request)
     {
         $request->validate(['email' => 'required|email']);
 
+        // 1. Créer le compte Stripe Connect
         $account = $this->stripe->createConnectAccount($request->email);
 
-        return response()->json($account);
+        // 2. Lier le compte au user connecté
+        $user = $request->user(); // ⚡ si tu utilises sanctum/jwt
+        $user->stripe_account_id = $account->id;
+        $user->save();
+
+        return response()->json([
+            'message' => 'Compte Stripe Connect créé et lié avec succès',
+            'account_id' => $account->id,
+        ]);
     }
 
-    // Générer un lien d'onboarding
+    /**
+     * Générer un lien d'onboarding Stripe
+     */
     public function createAccountLink(Request $request)
     {
         $request->validate([
@@ -64,7 +77,9 @@ class StripeController extends Controller
         return response()->json(['url' => $link->url]);
     }
 
-
+    /**
+     * Gérer les webhooks Stripe
+     */
     public function handleWebhook(Request $request)
     {
         $payload = $request->getContent();
@@ -81,16 +96,95 @@ class StripeController extends Controller
             return response()->json(['error' => 'Invalid webhook'], 400);
         }
 
-        // 🔥 Ajoute ce log
         Log::info('Webhook Stripe reçu', ['type' => $event->type]);
 
         if ($event->type === 'payment_intent.succeeded') {
             $paymentIntent = $event->data->object;
             Log::info('Paiement réussi', ['id' => $paymentIntent->id]);
-            // 👉 ici tu mets à jour ta réservation comme "payée"
+            // 👉 ici : update réservation / commande = payée
         }
 
         return response()->json(['status' => 'success']);
+    }
+
+    public function checkAccountStatus(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user->stripe_account_id) {
+            return response()->json([
+                'status' => 'no_account',
+                'message' => 'Aucun compte Stripe lié à cet utilisateur'
+            ], 400);
+        }
+
+        try {
+            $account = $this->stripe->retrieveAccount($user->stripe_account_id);
+
+            return response()->json([
+                'id' => $account->id,
+                'email' => $account->email,
+                'type' => $account->type,
+                'country' => $account->country,
+                'business_type' => $account->business_type,
+                'details_submitted' => $account->details_submitted,
+                'charges_enabled' => $account->charges_enabled,
+                'payouts_enabled' => $account->payouts_enabled,
+                'capabilities' => $account->capabilities,
+                'individual' => $account->individual,
+                'company' => $account->company,
+                'external_accounts' => $account->external_accounts,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Erreur récupération compte Stripe', ['error' => $e->getMessage()]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Impossible de récupérer le compte Stripe'
+            ], 500);
+        }
+    }
+
+    /**
+     * Créer un SetupIntent et renvoyer le client_secret
+     */
+    public function createSetupIntent(Request $request)
+    {
+        try {
+            $setupIntent = $this->stripe->createSetupIntent();
+            return response()->json(['client_secret' => $setupIntent->client_secret]);
+        } catch (\Exception $e) {
+            Log::error('Erreur création SetupIntent', ['error' => $e->getMessage()]);
+            return response()->json([
+                'message' => "Impossible de créer un SetupIntent",
+            ], 500);
+        }
+    }
+
+    /**
+     * Vérifier le statut d'un PaymentIntent
+     */
+    public function checkPaymentStatus(Request $request, $paymentIntentId)
+    {
+        try {
+            $paymentIntent = $this->stripe->retrievePaymentIntent($paymentIntentId);
+            
+            return response()->json([
+                'status' => true,
+                'payment_intent' => [
+                    'id' => $paymentIntent->id,
+                    'status' => $paymentIntent->status,
+                    'amount' => $paymentIntent->amount / 100,
+                    'currency' => $paymentIntent->currency,
+                    'metadata' => $paymentIntent->metadata,
+                    'created' => date('Y-m-d H:i:s', $paymentIntent->created)
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'error' => $e->getMessage()
+            ], 400);
+        }
     }
 
 }

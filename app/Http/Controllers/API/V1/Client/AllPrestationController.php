@@ -21,7 +21,7 @@ class AllPrestationController extends Controller
         $prix       = $request->get('prix');
 
         $menusQuery = Menu::with([
-            'user:id,firstNameOrPseudo,lastName,phone,email,biographie,photo_url',
+            'user:id,firstNameOrPseudo,lastName,phone,email,biographie,photo_url,stripe_account_id',
             'prestations.typeDeRepas',
             'prestations.reservationsConfirmées'
         ])
@@ -82,7 +82,7 @@ class AllPrestationController extends Controller
         $placeDisponible = $request->get('placeDisponible');
 
         $menusQuery = Menu::with([
-            'user:id,firstNameOrPseudo,lastName,phone,email,biographie,photo_url',
+            'user:id,firstNameOrPseudo,lastName,phone,email,biographie,photo_url,stripe_account_id',
             'prestations.typeDeRepas',
             'prestations.reservationsConfirmées'
         ])

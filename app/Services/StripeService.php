@@ -13,30 +13,44 @@ class StripeService
         $this->stripe = new StripeClient(config('services.stripe.secret'));
     }
 
+
     /**
-     * Créer un PaymentIntent
+     * Créer un PaymentIntent avec destination (alternative recommandée)
+     * Cette méthode fait apparaître immédiatement la transaction dans le dashboard du chef
      */
-    public function createPaymentIntent($amount, $currency = 'eur', $chefStripeId = null, $fee = 100)
+    public function createPaymentIntentWithDestination($amount, $currency = 'eur', $chefStripeId = null, $applicationFee = null)
     {
-        return $this->stripe->paymentIntents->create([
-            'amount' => $amount * 100, // convertir en centimes
+        $amountCents = intval($amount * 100);
+        
+        $params = [
+            'amount' => $amountCents,
             'currency' => $currency,
             'payment_method_types' => ['card'],
-            'application_fee_amount' => $fee, // commission de la plateforme
-            'transfer_data' => [
-                'destination' => $chefStripeId, // compte connect du chef
-            ],
-        ]);
+        ];
+        
+        // Utiliser destination charges pour une meilleure visibilité
+        if ($chefStripeId) {
+            $params['transfer_data'] = [
+                'destination' => $chefStripeId,
+            ];
+            
+            // La commission de l'application
+            if ($applicationFee) {
+                $params['application_fee_amount'] = intval($applicationFee * 100);
+            }
+        }
+        
+        return $this->stripe->paymentIntents->create($params);
     }
 
     /**
-     * Créer un compte Connect (chef)
+     * Créer un compte Connect pour un chef
      */
-    public function createConnectAccount($email)
+    public function createConnectAccount($email, $country = 'FR')
     {
         return $this->stripe->accounts->create([
             'type' => 'express',
-            'country' => 'FR', // ou SN pour Sénégal si supporté
+            'country' => $country,
             'email' => $email,
             'capabilities' => [
                 'card_payments' => ['requested' => true],
@@ -46,7 +60,7 @@ class StripeService
     }
 
     /**
-     * Générer un onboarding link pour un compte Connect
+     * Générer un lien d'onboarding pour un compte Connect
      */
     public function createAccountLink($accountId, $refreshUrl, $returnUrl)
     {
@@ -57,4 +71,28 @@ class StripeService
             'type' => 'account_onboarding',
         ]);
     }
+    
+    public function retrieveAccount($accountId)
+    {
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret')); // Assure-toi que ta clé est bonne
+        return \Stripe\Account::retrieve($accountId);
+    }
+
+
+
+    /**
+     * Créer un SetupIntent pour permettre d'enregistrer une carte
+     */
+    public function createSetupIntent()
+    {
+        return $this->stripe->setupIntents->create([
+            'payment_method_types' => ['card'],
+        ]);
+    }
+
+    public function retrievePaymentIntent(string $paymentIntentId)
+    {
+        return $this->stripe->paymentIntents->retrieve($paymentIntentId);
+    }
+
 }

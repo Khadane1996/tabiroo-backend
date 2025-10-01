@@ -291,6 +291,7 @@ class AuthController extends Controller
                     'biographie' => $user->biographie,
                     'adresse' => $user->adresse,
                     'bancaire' => $user->bancaire,
+                    'stripe_account_id' => $user->stripe_account_id,
                 ],
             ], 200);
 

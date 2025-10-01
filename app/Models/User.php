@@ -29,6 +29,7 @@ class User extends Authenticatable
         'etat',
         'email',
         'password',
+        'stripe_account_id',
     ];
 
     /**

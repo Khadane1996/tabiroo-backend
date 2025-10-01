@@ -35,8 +35,8 @@
         <div class="blog">
             <h1>A la une</h1>
             <div class="blog-hero"> 
-                <h1> Lorem ipsum dolor color sit.</h1>
-                <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc<br> fermentum. </p>  
+                <h1>Tabiroo : découvrez l’expérience unique des repas faits maison</h1>
+                <p>Bien plus qu’un repas, Tabiroo vous invite à partager des saveurs authentiques et des moments chaleureux chez des hôtes passionnés.</p> 
             </div>
             <div class="third">
                 <h1>Découvrez également</h1>

@@ -38,55 +38,22 @@
         <div class="blocs">
             <div class="first">
                 <div class="text">
-                    <h1>À propos de <span class="tab">Tabiroo </span><span>Toi !</span></h1>
-                    <p>Si t'es ici, ce n'est pas pour lire une présentation banale. Ce n'est pas pour connaître l'histoire d'une entreprise. C'est pour ressentir l'état d'esprit qui m'anime. Alors, autant que cette parenthèse t'apporte quelque chose — pas juste pour ta curiosité, mais pour toi, tes ambitions, ton énergie.</p>
-                    <h1>Tout est une question <br></span><span>d'état d'esprit.</span></h1>
+                    <!-- <h1>À propos de <span class="tab">Tabiroo </span><span>Toi !</span></h1> -->
                     <p>
-                        On le voit tous les jours : quelqu'un réussit, sans forcément avoir plus de talent, plus d'argent, ni même plus d'opportunités. Mais il y arrive. Encore et encore. Pourquoi ? Parce qu'il a décidé d'y arriver.
+                        Tabiroo – Le goût du fait maison, la chaleur du partage.
+
+                        Envie de vivre une expérience culinaire qui sort de l’ordinaire ? Avec Tabiroo, réservez votre place à la table d’hôtes passionnés, et plongez dans un univers de saveurs authentiques, de rencontres chaleureuses et de moments uniques.
+
+                        Tabiroo, c’est la rencontre entre des particuliers gourmands et des chefs du quotidien qui partagent leur passion autour de repas faits maison.
+                        Chez nos hôtes, chaque plat raconte une histoire, chaque repas devient une expérience conviviale, loin des codes traditionnels de la restauration.
+
+                        Nous croyons que la meilleure cuisine est celle que l’on partage.
+                        Grâce à Tabiroo, nos hôtes peuvent vivre pleinement leur passion et compléter leurs revenus en toute liberté, pendant que nos convives découvrent des expériences exclusives et inoubliables.
+
+                        Tabiroo, c’est l’authenticité, la proximité et la convivialité au cœur de chaque bouchée.
                     </p>
                 </div>
-                <img src="{{ asset('images/first.svg') }}" alt="">
-            </div>
-            <div class="second">
-                <h1> Dans la vie, il y a trois <span>types de personnes :</span></h1>
-                <div class="enum">
-                    <div class="numero">
-                        <div class="bloc-chiffre">
-                            <img src="{{ asset('images/uno.svg') }}" alt="">
-                            <p>Ceux qui ne tentent rien. Ils regardent, envient, mais ne bougent pas.</p>
-                        </div>
-                        <div class="bloc-chiffre">
-                            <img src="{{ asset('images/dos.svg') }}" alt="">
-                            <p>Ceux qui doutent. Ils commencent avec de freins, s'auto-sabotent avant même d'avoir essayé.</p>
-                        </div>
-                        <div class="bloc-chiffre">
-                            <img src="{{ asset('images/tres.svg') }}" alt="">
-                            <p>Ceux qui se voient déjà vainqueurs. Avant même de jouer, ils ont décidé qu'ils allaient gagner.</p>
-                        </div>
-                    </div>
-                </div>  
-            </div>
-        </div>
-        <div class="three">
-            <p>Les 3 finissent toujours par gagner. Pas parce qu'ils sont les plus doués, mais parce qu'ils y croient plus fort que les autres. Alors pose-toi une vraie question : Dans quel groupe tu te places ? Le temps, lui, ne t'attend pas. Il avance, implacable. Chaque jour, il creuse un vide derrière toi. Tu avances, ou tu tombes. Mais, que tu bouges ou non, la vie continue sans t'attendre. Sois acteur. Prends ta place. Provoque ta réussite. Même si t'as des doutes, avance. Parce qu'au final… tout est une question d'état d'esprit.</p>
-        </div>
-        <div class="blocs" style="margin: 0 !important;">
-            <div class="first">
-                <div class="bloc-img">
-                    <img src="{{ asset('images/logo.svg') }}" alt="" width="50%" class="tabiroo-logo">
-                    <img src="{{ asset('images/third.svg') }}" alt="">
-                </div>
-                <div class="text">
-                    <h1 class="tabiroo-title">Et maintenant, <span>parlons de<br>Tabiroo.</span></h1>
-                    <p class="tabiroo-text">Tabiroo n'est pas juste une plateforme, c'est une expérience culinaire unique qui reconnecte les gens autour de ce qu'il y a de plus authentique : des repas faits maison, des moments de partage, et des rencontres inoubliables.<br><br>
-
-                        Ici, les hôtes passionnés partagent leur savoir-faire et ouvrent leur porte pour offrir une expérience exclusive. Chaque plat est cuisiné avec cœur, chaque repas devient une aventure humaine. Que tu sois en quête de nouvelles saveurs ou d'un moment chaleureux chez un hôte passionné, Tabiroo transforme chaque repas en une véritable immersion culinaire.<br><br>
-                        
-                        Envie de découvrir des mets faits maison, préparés avec soin ?
-                        Tu cherches une expérience gastronomique authentique, loin des restaurants traditionnels ?<br><br>
-                        
-                        Avec Tabiroo, plonge dans un univers où la cuisine devient émotion, partage, et exclusivité. Que tu sois un hôte cherchant un complément de revenu en partageant ta passion, ou un convive à la recherche de découvertes gustatives, Tabiroo est la plateforme idéale pour vivre une aventure culinaire sans égal.</p>                    
-                </div>
+                <!-- <img src="{{ asset('images/first.svg') }}" alt=""> -->
             </div>
         </div>
          

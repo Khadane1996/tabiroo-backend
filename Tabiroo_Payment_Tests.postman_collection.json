@@ -1,0 +1,378 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "Tabiroo Payment Tests",
+		"description": "Collection complète pour tester le système de paiement Stripe de Tabiroo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Setup",
+			"item": [
+				{
+					"name": "Login Chef",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"CHEF_TOKEN\", jsonData.token);",
+									"pm.environment.set(\"CHEF_ID\", jsonData.user.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"chef@example.com\",\n    \"password\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/auth/login",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Stripe Account",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"CHEF_STRIPE_ACCOUNT_ID\", jsonData.account_id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{CHEF_TOKEN}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"chef@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/stripe/account",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"stripe",
+								"account"
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Onboarding Link",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{CHEF_TOKEN}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"account_id\": \"{{CHEF_STRIPE_ACCOUNT_ID}}\",\n    \"refresh_url\": \"{{BASE_URL}}/stripe/refresh\",\n    \"return_url\": \"{{BASE_URL}}/stripe/return\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/stripe/account/link",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"stripe",
+								"account",
+								"link"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Client Flow",
+			"item": [
+				{
+					"name": "Login Client",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"CLIENT_TOKEN\", jsonData.token);",
+									"pm.environment.set(\"CLIENT_ID\", jsonData.user.id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"client@example.com\",\n    \"password\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/auth/login",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Reservation & Payment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"RESERVATION_ID\", jsonData.reservation.id);",
+									"pm.environment.set(\"CLIENT_SECRET\", jsonData.client_secret);",
+									"pm.environment.set(\"PAYMENT_INTENT_ID\", jsonData.reservation.payment_intent_id);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{CLIENT_TOKEN}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"menu_prestation_id\": 1,\n    \"client_id\": {{CLIENT_ID}},\n    \"chef_id\": {{CHEF_ID}},\n    \"sous_total\": 45.00,\n    \"frais_service\": 5.00,\n    \"nombre_convive\": 2,\n    \"date_prestation\": \"2025-10-15\",\n    \"choix\": \"oui\",\n    \"chef_stripe_account_id\": \"{{CHEF_STRIPE_ACCOUNT_ID}}\",\n    \"amount\": 50.00\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/api/client/reservation/reserve-and-pay",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"client",
+								"reservation",
+								"reserve-and-pay"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Payment Status",
+			"item": [
+				{
+					"name": "Check Payment Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{CLIENT_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/api/stripe/payment-intent/{{PAYMENT_INTENT_ID}}/status",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"stripe",
+								"payment-intent",
+								"{{PAYMENT_INTENT_ID}}",
+								"status"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Verification",
+			"item": [
+				{
+					"name": "Get Reservation Payment Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{CLIENT_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/api/client/reservation/{{RESERVATION_ID}}/payment-details",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"client",
+								"reservation",
+								"{{RESERVATION_ID}}",
+								"payment-details"
+							]
+						}
+					}
+				},
+				{
+					"name": "List Client Reservations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{CLIENT_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/api/client/reservation/{{CLIENT_ID}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"client",
+								"reservation",
+								"{{CLIENT_ID}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "List Chef Reservations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{CHEF_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/api/client/reservation-chef/{{CHEF_ID}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"client",
+								"reservation-chef",
+								"{{CHEF_ID}}"
+							]
+						}
+					}
+				},
+				{
+					"name": "Check Stripe Account Status",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{CHEF_TOKEN}}"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}/api/stripe/status",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"api",
+								"stripe",
+								"status"
+							]
+						}
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "BASE_URL",
+			"value": "http://localhost:8000"
+		}
+	]
+}

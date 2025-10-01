@@ -53,4 +53,17 @@ class Notification extends Model
         ]);
     }
 
+    public static function notifyPaymentDistributed($chef_id, $reservation_id)
+    {
+        return self::create([
+            'user_id' => $chef_id,
+            'reservation_id' => $reservation_id,
+            'type' => 'paiement_distribue',
+            'date_notification' => Carbon::now()->toDateString(),
+            'heure_notification' => Carbon::now()->toTimeString(),
+            'etat' => 0,
+            'commentaire' => 'Le paiement de la réservation #' . $reservation_id . ' a été transféré sur votre compte',
+        ]);
+    }
+
 }
