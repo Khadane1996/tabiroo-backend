@@ -22,6 +22,7 @@ class AllPrestationController extends Controller
 
         $menusQuery = Menu::with([
             'user:id,firstNameOrPseudo,lastName,phone,email,biographie,photo_url,stripe_account_id',
+            'user.adresse:id,user_id,latitude,longitude', // <-- ajout ici
             'prestations.typeDeRepas',
             'prestations.reservationsConfirmées'
         ])
@@ -83,6 +84,7 @@ class AllPrestationController extends Controller
 
         $menusQuery = Menu::with([
             'user:id,firstNameOrPseudo,lastName,phone,email,biographie,photo_url,stripe_account_id',
+            'user.adresse:id,user_id,latitude,longitude', // <-- ajout ici
             'prestations.typeDeRepas',
             'prestations.reservationsConfirmées'
         ])
