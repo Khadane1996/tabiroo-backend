@@ -13,6 +13,9 @@ class Plat extends Model
     protected $fillable = [
         'user_id',
         'photo_url',
+        'photo_url_2',
+        'photo_url_3',
+        'photo_url_4',
         'nom',
         'bioPlat',
         'ingredient',

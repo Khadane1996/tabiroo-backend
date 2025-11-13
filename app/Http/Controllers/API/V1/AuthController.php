@@ -763,14 +763,15 @@ class AuthController extends Controller
 
             $fileName = null;
 
-            if ($user->photo_url) {
-                $oldPath = public_path('uploads/profile/' . $user->photo_url);
-                if (file_exists($oldPath)) {
-                    unlink($oldPath);
-                }
-            }
-
             if ($request->hasFile('photo_url')) {
+                // Supprimer l'ancienne photo seulement si une nouvelle est envoyée
+                if ($user->photo_url) {
+                    $oldPath = public_path('uploads/profile/' . $user->photo_url);
+                    if (file_exists($oldPath)) {
+                        unlink($oldPath);
+                    }
+                }
+
                 $file = $request->file('photo_url');
                 $fileName = time() . '_' . $file->getClientOriginalName();
                 
@@ -782,14 +783,21 @@ class AuthController extends Controller
                 $file->move($path, $fileName);
             }
 
-            $user->update([
+            // Préparer les données de mise à jour
+            $updateData = [
                 'firstNameOrPseudo' => $request->firstNameOrPseudo,
                 'lastName' => $request->lastName,
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'biographie' => $request->biographie,
-                'photo_url' => $fileName
-            ]);
+            ];
+
+            // Mettre à jour photo_url uniquement si une nouvelle photo a été uploadée
+            if ($fileName !== null) {
+                $updateData['photo_url'] = $fileName;
+            }
+
+            $user->update($updateData);
 
             return response()->json([
                 'status' => true,

@@ -68,7 +68,7 @@ class MenuController extends Controller
                 'nom' => $request->nom,
                 'bioMenu' => $request->bioMenu,
                 'prix' => $request->prix,
-                'photo_url' => $request->photo_url ? $this->uploadPhoto($request->file('photo_url')) : null,
+                'photo_url' => $request->hasFile('photo_url') ? $this->uploadPhoto($request->file('photo_url')) : null,
             ]);
 
             if ($request->has('plat_ids')) {
@@ -118,13 +118,19 @@ class MenuController extends Controller
                 ], 401);
             }
 
-            // Mise à jour du menu
-            $menu->update([
+            // Préparer les données de mise à jour
+            $updateData = [
                 'nom' => $request->nom,
                 'bioMenu' => $request->bioMenu,
                 'prix' => $request->prix,
-                'photo_url' => $request->photo_url ? $this->uploadPhoto($request->file('photo_url')) : $menu->photo_url,
-            ]);
+            ];
+
+            if ($request->hasFile('photo_url')) {
+                $updateData['photo_url'] = $this->uploadPhoto($request->file('photo_url'));
+            }
+
+            // Mise à jour du menu
+            $menu->update($updateData);
 
             // Mettre à jour les plats associés
             if ($request->has('plat_ids')) {

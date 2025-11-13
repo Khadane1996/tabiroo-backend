@@ -1,0 +1,22 @@
+
+
+NB: App pro = App chef
+-Créer des catégories dans la liste des plats pour catégoriser les plats en fonction de leur nature : entrées, plats principaux, desserts...
+-App chef : il faut baliser les heures de début et fin des prestations en fonction de la plage horaire (On ne devrait pas pouvoir renseigner une heure qui ne correspond pas au créneau horaire du type de repas (brunch, déjeuner...)
+-App chef : Mettre un contrôle au niveau de la création d'une prestation pour vérifier la création du compte stripe (Le chef ne doit pas pouvoir créer une prestation si sont compte stripe n’est pas configuré. Et; aucune prestation ne doit apparaitre sur l’app client si le chef n’a pas de compte stripe)
+-App client et chef : Afficher les mots de passe avec l'oeuil pour la création de compte et la connexion
+-App chef et client : Lorsqu'on clique sur enregistré un profil déjà créé, la photo du profil disparait.
+-App chef et client : Décaler l'icone de modification de la photo de profil pour la rendre plus visible.
+-App Pro et client : Dans le detail des plats qui compose les menus, ajouter plus de photos et les faire défiler de droite à gauche.
+-App Pro et client : Ajouter un œil de couleur orange à côté de chaque plat pour indiquer au client qu'il peut cliquer sur le plat pour afficher le détail avec les photos, description, ingrédients...
+-App pro : ajouter un multi-select pour le régime alimentaire et le type de cuisine + ajouter un item "autre" pour les types de cuisines.
+-App chef : Retirer le place holder 23€ en gris dans la création des menus
+-App chef : La couleur des plats sélectionnés lors de la création des menus doit être coloré en orange pour bien appuyer sur le fait que le plat ait été sélectionné.
+-App pro : ajouter la possibilité d'effectuer des photos à partir de l'application, uniquement en mode paysage.
+-App pro : Dans le détail des menus de l'app chef : il faut retirer la localisation et retirer le bouton "afficher la carte". C'est info sont pertinente uniquement sur l'app client car il y a un point de départ et un point d'arrivé.
+-App chef : pour la création des prestations, il faut retirer la plage horaire. Puis au niveau des heures de début et de fin de prestation, il faut ajouter une phrase en italique indiquant les plages horaires des différents types de repas
+-App pro : Lors de la création d'une prestation => retirer les flèches en haut et en bas des heures de début et de fin de la prestations et repositionner les deux petits points ":" plus bas.
+-App chef : Les jours et les dates sont légèrement décalées. Il faudrait les alignées pour éviter les erreurs de saisies.
+-App chef : Retirer le nom dans le profil et laisser uniquement "nom ou pseudo". Puis limité le nombre de caractère pour le "nom ou pseudo" afin qu'il ne dépasse pas sur la carte côté app client.
+-App client : s'il n'y a pas d'adresse de départ et que l'utilisateur renseigne une adresse, il faut qu'elle soit sélectionnée par défaut. Dans le cas où il y aurait plusieurs adresses, il faut pouvoir sélectionner l'adresse par défaut. Actuellement il faut revenir une seconde fois sur l'adresse de départ pour sélectionner une adresse.
+-App client : Revoir les filtres de recherche + ajouter le nombre de convives à côté du drop down.

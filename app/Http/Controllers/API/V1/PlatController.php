@@ -50,6 +50,9 @@ class PlatController extends Controller
                 'regime_alimentaire_id' => 'nullable|exists:regimes_alimentaire,id',
                 // 'theme_culinaire_id' => 'nullable|exists:themes_culinaire,id',
                 'photo_url' => 'nullable|file|mimes:jpg,jpeg,png,heic|max:4096',
+                'photo_url_2' => 'nullable|file|mimes:jpg,jpeg,png,heic|max:4096',
+                'photo_url_3' => 'nullable|file|mimes:jpg,jpeg,png,heic|max:4096',
+                'photo_url_4' => 'nullable|file|mimes:jpg,jpeg,png,heic|max:4096',
             ]);
 
             if($validate->fails()){
@@ -60,24 +63,12 @@ class PlatController extends Controller
                 ], 401);
             }
 
-            $fileName = null;
-            if ($user->photo_url) {
-                $oldPath = public_path('uploads/profiles/' . $user->photo_url);
-                if (file_exists($oldPath)) {
-                    unlink($oldPath);
+            $photoFields = ['photo_url', 'photo_url_2', 'photo_url_3', 'photo_url_4'];
+            $uploadedPhotos = [];
+            foreach ($photoFields as $field) {
+                if ($request->hasFile($field)) {
+                    $uploadedPhotos[$field] = $this->uploadPlatPhoto($request->file($field));
                 }
-            }
-
-            if ($request->hasFile('photo_url')) {
-                $file = $request->file('photo_url');
-                $fileName = time() . '_' . $file->getClientOriginalName();
-                
-                $path = public_path('uploads/plats');
-                if (!file_exists($path)) {
-                    mkdir($path, 0777, true);
-                }
-
-                $file->move($path, $fileName);
             }
 
             $plat = Plat::create([
@@ -86,7 +77,10 @@ class PlatController extends Controller
                 'bioPlat' => $request->bioPlat,
                 'ingredient' => $request->ingredient,
                 'allergene' => $request->allergene,
-                'photo_url' => $fileName,
+                'photo_url' => $uploadedPhotos['photo_url'] ?? null,
+                'photo_url_2' => $uploadedPhotos['photo_url_2'] ?? null,
+                'photo_url_3' => $uploadedPhotos['photo_url_3'] ?? null,
+                'photo_url_4' => $uploadedPhotos['photo_url_4'] ?? null,
                 'type_de_plat_id' => $request->type_de_plat_id,
                 'type_de_cuisine_id' => $request->type_de_cuisine_id,
                 'regime_alimentaire_id' => $request->regime_alimentaire_id,
@@ -157,6 +151,9 @@ class PlatController extends Controller
                 'regime_alimentaire_id' => 'nullable|exists:regimes_alimentaire,id',
                 // 'theme_culinaire_id' => 'nullable|exists:themes_culinaire,id',
                 'photo_url' => 'nullable|file|mimes:jpg,jpeg,png,heic|max:4096',
+                'photo_url_2' => 'nullable|file|mimes:jpg,jpeg,png,heic|max:4096',
+                'photo_url_3' => 'nullable|file|mimes:jpg,jpeg,png,heic|max:4096',
+                'photo_url_4' => 'nullable|file|mimes:jpg,jpeg,png,heic|max:4096',
             ]);
 
             if ($validate->fails()) {
@@ -167,28 +164,7 @@ class PlatController extends Controller
                 ], 422);
             }
 
-            if ($request->hasFile('photo_url')) {
-                if ($plat->photo_url) {
-                    $oldPath = public_path('uploads/plats/' . $plat->photo_url);
-                    if (file_exists($oldPath)) {
-                        unlink($oldPath);
-                    }
-                }
-
-                $file = $request->file('photo_url');
-                $fileName = time() . '_' . $file->getClientOriginalName();
-
-                $path = public_path('uploads/plats');
-                if (!file_exists($path)) {
-                    mkdir($path, 0777, true);
-                }
-
-                $file->move($path, $fileName);
-
-                $plat->photo_url = $fileName;
-            }
-
-            $plat->update([
+            $updateData = [
                 'nom' => $request->nom ?? $plat->nom,
                 'bioPlat' => $request->bioPlat ?? $plat->bioPlat,
                 'ingredient' => $request->ingredient ?? $plat->ingredient,
@@ -197,7 +173,36 @@ class PlatController extends Controller
                 'type_de_cuisine_id' => $request->type_de_cuisine_id ?? $plat->type_de_cuisine_id,
                 'regime_alimentaire_id' => $request->regime_alimentaire_id ?? $plat->regime_alimentaire_id,
                 // 'theme_culinaire_id' => $request->theme_culinaire_id ?? $plat->theme_culinaire_id,
-            ]);
+            ];
+
+            $photoFields = ['photo_url', 'photo_url_2', 'photo_url_3', 'photo_url_4'];
+            foreach ($photoFields as $field) {
+                if ($request->hasFile($field)) {
+                    if ($plat->$field) {
+                        $oldPath = public_path('uploads/plats/' . $plat->$field);
+                        if (file_exists($oldPath)) {
+                            unlink($oldPath);
+                        }
+                    }
+                    $updateData[$field] = $this->uploadPlatPhoto($request->file($field));
+                }
+            }
+
+            $removePhotos = $request->input('remove_photos', []);
+            if (!is_array($removePhotos)) {
+                $removePhotos = [$removePhotos];
+            }
+            foreach ($removePhotos as $field) {
+                if (in_array($field, $photoFields, true) && $plat->$field) {
+                    $oldPath = public_path('uploads/plats/' . $plat->$field);
+                    if (file_exists($oldPath)) {
+                        unlink($oldPath);
+                    }
+                    $updateData[$field] = null;
+                }
+            }
+
+            $plat->update($updateData);
 
             return response()->json([
                 'status' => true,
@@ -213,6 +218,19 @@ class PlatController extends Controller
         }
     }
 
+    private function uploadPlatPhoto($file): string
+    {
+        $path = public_path('uploads/plats');
+        if (!file_exists($path)) {
+            mkdir($path, 0777, true);
+        }
+
+        $fileName = time() . '_' . $file->getClientOriginalName();
+        $file->move($path, $fileName);
+
+        return $fileName;
+    }
+
 
     public function destroy($id)
     {
@@ -223,10 +241,13 @@ class PlatController extends Controller
                 return response()->json(['message' => 'Plat non trouvé'], 404);
             }
 
-            if ($plat->photo_url) {
-                $imagePath = public_path('uploads/plats/' . $plat->photo_url);
-                if (file_exists($imagePath)) {
-                    unlink($imagePath);
+            $photoFields = ['photo_url', 'photo_url_2', 'photo_url_3', 'photo_url_4'];
+            foreach ($photoFields as $field) {
+                if ($plat->$field) {
+                    $imagePath = public_path('uploads/plats/' . $plat->$field);
+                    if (file_exists($imagePath)) {
+                        unlink($imagePath);
+                    }
                 }
             }
 

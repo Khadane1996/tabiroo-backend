@@ -18,7 +18,9 @@ class AllPrestationController extends Controller
         $typeRepasIds    = Arr::wrap($request->get('types_de_repas'));
         $placeDisponible = $request->get('placeDisponible');
         $mieuxNote       = $request->get('mieuxNote');
-        $prix       = $request->get('prix');
+        $prix            = $request->get('prix');
+        $typeCuisineIds  = Arr::wrap($request->get('types_cuisine'));
+        $regimeIds       = Arr::wrap($request->get('regimes_alimentaire'));
 
         $menusQuery = Menu::with([
             'user:id,firstNameOrPseudo,lastName,phone,email,biographie,photo_url,stripe_account_id',
@@ -26,7 +28,11 @@ class AllPrestationController extends Controller
             'prestations.typeDeRepas',
             'prestations.reservationsConfirmées'
         ])
-        ->whereHas('prestations');
+        ->whereHas('prestations')
+        // Filtrer uniquement les menus des chefs avec compte Stripe configuré
+        ->whereHas('user', function ($q) {
+            $q->whereNotNull('stripe_account_id');
+        });
 
         // Si on filtre par type de repas
         if (!empty($typeRepasIds)) {
@@ -60,6 +66,20 @@ class AllPrestationController extends Controller
             });
         }
 
+        // Filtre par type de cuisine
+        if (!empty($typeCuisineIds)) {
+            $menusQuery->whereHas('plats', function ($q) use ($typeCuisineIds) {
+                $q->whereIn('type_de_cuisine_id', $typeCuisineIds);
+            });
+        }
+
+        // Filtre par régime alimentaire
+        if (!empty($regimeIds)) {
+            $menusQuery->whereHas('plats', function ($q) use ($regimeIds) {
+                $q->whereIn('regime_alimentaire_id', $regimeIds);
+            });
+        }
+
         if ($prix) {
             $menusQuery->orderBy('prix', 'asc');
         } else {
@@ -89,6 +109,10 @@ class AllPrestationController extends Controller
             'prestations.reservationsConfirmées'
         ])
         ->whereHas('prestations')
+        // Filtrer uniquement les menus des chefs avec compte Stripe configuré
+        ->whereHas('user', function ($q) {
+            $q->whereNotNull('stripe_account_id');
+        })
         ->withAvg('avisClients', 'note_client')  // Calcul de la moyenne des notes
         ->orderBy('avis_clients_avg_note_client', 'asc')  // Tri par moyenne décroissante
         ->orderBy('id', 'desc');

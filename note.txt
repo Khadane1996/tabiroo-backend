@@ -1,8 +1,7 @@
 
-php artisan serve --host 172.20.10.2 --port 8000
+php artisan serve --host 192.168.1.2 --port 8000
 
 stripe listen --forward-to http://127.0.0.1:8000/stripe/webhook
-
 
 > lsof -i :8000
 > kill -9 $(lsof -ti :8000)

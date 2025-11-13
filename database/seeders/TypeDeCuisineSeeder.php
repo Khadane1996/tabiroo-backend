@@ -39,7 +39,7 @@ class TypeDeCuisineSeeder extends Seeder
                 'Turque',
                 'Réunionnaise',
                 'Fusion',
-                'aucun'
+                'Autre'
             ];
     
             foreach ($types as $desc) {
