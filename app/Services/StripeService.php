@@ -18,7 +18,7 @@ class StripeService
      * Créer un PaymentIntent avec destination (alternative recommandée)
      * Cette méthode fait apparaître immédiatement la transaction dans le dashboard du chef
      */
-    public function createPaymentIntentWithDestination($amount, $currency = 'eur', $chefStripeId = null, $applicationFee = null)
+    public function createPaymentIntentWithDestination($amount, $currency = 'eur', $chefStripeId = null, $applicationFee = null, $customerId = null)
     {
         $amountCents = intval($amount * 100);
         
@@ -27,6 +27,11 @@ class StripeService
             'currency' => $currency,
             'payment_method_types' => ['card'],
         ];
+
+        // Associer à un customer pour pouvoir réutiliser des moyens de paiement sauvegardés
+        if ($customerId) {
+            $params['customer'] = $customerId;
+        }
         
         // Utiliser destination charges pour une meilleure visibilité
         if ($chefStripeId) {
@@ -83,11 +88,31 @@ class StripeService
     /**
      * Créer un SetupIntent pour permettre d'enregistrer une carte
      */
-    public function createSetupIntent()
+    public function createSetupIntent(?string $customerId = null)
     {
-        return $this->stripe->setupIntents->create([
+        $params = [
             'payment_method_types' => ['card'],
-        ]);
+        ];
+
+        if ($customerId) {
+            $params['customer'] = $customerId;
+        }
+
+        return $this->stripe->setupIntents->create($params);
+    }
+
+    /**
+     * Créer un Customer Stripe
+     */
+    public function createCustomer(string $email, ?string $name = null)
+    {
+        $data = [
+            'email' => $email,
+        ];
+        if ($name) {
+            $data['name'] = $name;
+        }
+        return $this->stripe->customers->create($data);
     }
 
     public function retrievePaymentIntent(string $paymentIntentId)

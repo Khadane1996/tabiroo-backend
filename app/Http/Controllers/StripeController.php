@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\StripeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Models\User;
 
 class StripeController extends Controller
 {
@@ -150,7 +151,22 @@ class StripeController extends Controller
     public function createSetupIntent(Request $request)
     {
         try {
-            $setupIntent = $this->stripe->createSetupIntent();
+            $user = $request->user();
+            if (!$user) {
+                return response()->json([
+                    'message' => 'Utilisateur non authentifié',
+                ], 401);
+            }
+
+            // S'assurer que le client a un Stripe Customer pour pouvoir réutiliser les cartes
+            if (!$user->stripe_customer_id) {
+                $name = trim(($user->firstNameOrPseudo ?? '') . ' ' . ($user->lastName ?? '')) ?: null;
+                $customer = $this->stripe->createCustomer($user->email, $name);
+                $user->stripe_customer_id = $customer->id;
+                $user->save();
+            }
+
+            $setupIntent = $this->stripe->createSetupIntent($user->stripe_customer_id);
             return response()->json(['client_secret' => $setupIntent->client_secret]);
         } catch (\Exception $e) {
             Log::error('Erreur création SetupIntent', ['error' => $e->getMessage()]);

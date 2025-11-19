@@ -10,6 +10,7 @@ use App\Models\Notification;
 use Illuminate\Support\Facades\DB;
 use App\Services\StripeService;
 use Illuminate\Support\Facades\Log;
+use App\Models\User;
 
 
 
@@ -141,12 +142,27 @@ class ReservationController extends Controller
                 'status' => $status,
             ]);
 
+            // Récupérer le client pour attacher un Stripe Customer au PaymentIntent (si disponible)
+            $customerId = null;
+            try {
+                $client = User::find($request->client_id);
+                if ($client && $client->stripe_customer_id) {
+                    $customerId = $client->stripe_customer_id;
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Impossible de récupérer le stripe_customer_id du client', [
+                    'client_id' => $request->client_id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
             // Créer PaymentIntent avec destination charges (paiement direct au chef)
             $pi = $this->stripe->createPaymentIntentWithDestination(
                 $request->amount,
                 'eur',
                 $request->chef_stripe_account_id,
-                $request->frais_service // Les frais restent sur le compte principal
+                $request->frais_service, // Les frais restent sur le compte principal
+                $customerId
             );
 
             // Stocker l'id du PI sur la réservation
