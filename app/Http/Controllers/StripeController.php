@@ -44,11 +44,13 @@ class StripeController extends Controller
     {
         $request->validate(['email' => 'required|email']);
 
-        // 1. Créer le compte Stripe Connect
-        $account = $this->stripe->createConnectAccount($request->email);
+        // 1. Récupérer l'utilisateur authentifié
+        $user = $request->user(); // ⚡ via Sanctum
 
-        // 2. Lier le compte au user connecté
-        $user = $request->user(); // ⚡ si tu utilises sanctum/jwt
+        // 2. Créer le compte Stripe Connect à partir des infos du user
+        $account = $this->stripe->createConnectAccount($user);
+
+        // 3. Lier le compte au user connecté
         $user->stripe_account_id = $account->id;
         $user->save();
 

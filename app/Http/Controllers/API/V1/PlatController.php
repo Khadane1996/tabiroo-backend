@@ -17,7 +17,10 @@ class PlatController extends Controller
         $plats = Plat::with([
             'typeDePlat',
             'typeDeCuisine',
+            // relation historique (one-to-one)
             'regimeAlimentaire',
+            // nouvelle relation many-to-many
+            'regimesAlimentaires',
             // 'themeCulinaire',
         ])
         ->where('user_id', $user->id)
@@ -38,6 +41,16 @@ class PlatController extends Controller
 
             $user = Auth::user();
 
+            // Normaliser le payload de régimes : on accepte soit regime_alimentaire_id (single),
+            // soit regime_alimentaire_ids (array) pour le multi-select.
+            $regimesIds = $request->input('regime_alimentaire_ids', []);
+            if (!is_array($regimesIds)) {
+                $regimesIds = $regimesIds !== null ? [$regimesIds] : [];
+            }
+            if (empty($regimesIds) && $request->filled('regime_alimentaire_id')) {
+                $regimesIds = [$request->input('regime_alimentaire_id')];
+            }
+
             $validate = Validator::make(
                 array_merge($request->all(), $request->allFiles()),
             [
@@ -47,7 +60,11 @@ class PlatController extends Controller
                 'allergene' => 'nullable|string',
                 'type_de_plat_id' => 'nullable|exists:types_de_plat,id',
                 'type_de_cuisine_id' => 'nullable|exists:types_de_cuisine,id',
+                // compatibilité : ancien champ single
                 'regime_alimentaire_id' => 'nullable|exists:regimes_alimentaire,id',
+                // nouveau champ multi
+                'regime_alimentaire_ids' => 'nullable|array',
+                'regime_alimentaire_ids.*' => 'exists:regimes_alimentaire,id',
                 // 'theme_culinaire_id' => 'nullable|exists:themes_culinaire,id',
                 'photo_url' => 'nullable|file|mimes:jpg,jpeg,png,heic|max:4096',
                 'photo_url_2' => 'nullable|file|mimes:jpg,jpeg,png,heic|max:4096',
@@ -83,14 +100,21 @@ class PlatController extends Controller
                 'photo_url_4' => $uploadedPhotos['photo_url_4'] ?? null,
                 'type_de_plat_id' => $request->type_de_plat_id,
                 'type_de_cuisine_id' => $request->type_de_cuisine_id,
-                'regime_alimentaire_id' => $request->regime_alimentaire_id,
+                // pour compatibilité, on conserve le premier régime (s'il existe) dans la colonne historique
+                'regime_alimentaire_id' => !empty($regimesIds) ? $regimesIds[0] : null,
                 'theme_culinaire_id' => $request->theme_culinaire_id,
             ]);
+
+            // Attacher les régimes multiples dans la table pivot
+            if (!empty($regimesIds)) {
+                $plat->regimesAlimentaires()->sync($regimesIds);
+            }
 
             $data = Plat::with([
                 'typeDePlat',
                 'typeDeCuisine',
                 'regimeAlimentaire',
+                'regimesAlimentaires',
                 'themeCulinaire'
             ])->where('id', $plat->id)->first();
 
@@ -115,6 +139,7 @@ class PlatController extends Controller
                 'typeDePlat',
                 'typeDeCuisine',
                 'regimeAlimentaire',
+                'regimesAlimentaires',
                 // 'themeCulinaire'
             ])->find($id);
 
@@ -141,6 +166,15 @@ class PlatController extends Controller
                 return response()->json(['message' => 'Plat non trouvé'], 404);
             }
 
+            // Normaliser le payload de régimes : single ou multiple
+            $regimesIds = $request->input('regime_alimentaire_ids', null);
+            if (!is_null($regimesIds) && !is_array($regimesIds)) {
+                $regimesIds = [$regimesIds];
+            }
+            if (is_null($regimesIds) && $request->filled('regime_alimentaire_id')) {
+                $regimesIds = [$request->input('regime_alimentaire_id')];
+            }
+
             $validate = Validator::make($request->all(), [
                 'nom' => 'sometimes|required|string|max:255',
                 'bioPlat' => 'sometimes|required|string|max:255',
@@ -148,7 +182,11 @@ class PlatController extends Controller
                 'allergene' => 'nullable|string',
                 'type_de_plat_id' => 'nullable|exists:types_de_plat,id',
                 'type_de_cuisine_id' => 'nullable|exists:types_de_cuisine,id',
+                // compatibilité : ancien champ single
                 'regime_alimentaire_id' => 'nullable|exists:regimes_alimentaire,id',
+                // nouveau champ multi
+                'regime_alimentaire_ids' => 'nullable|array',
+                'regime_alimentaire_ids.*' => 'exists:regimes_alimentaire,id',
                 // 'theme_culinaire_id' => 'nullable|exists:themes_culinaire,id',
                 'photo_url' => 'nullable|file|mimes:jpg,jpeg,png,heic|max:4096',
                 'photo_url_2' => 'nullable|file|mimes:jpg,jpeg,png,heic|max:4096',
@@ -171,7 +209,10 @@ class PlatController extends Controller
                 'allergene' => $request->allergene ?? $plat->allergene,
                 'type_de_plat_id' => $request->type_de_plat_id ?? $plat->type_de_plat_id,
                 'type_de_cuisine_id' => $request->type_de_cuisine_id ?? $plat->type_de_cuisine_id,
-                'regime_alimentaire_id' => $request->regime_alimentaire_id ?? $plat->regime_alimentaire_id,
+                // on garde une valeur "principale" pour compatibilité
+                'regime_alimentaire_id' => is_array($regimesIds) && !empty($regimesIds)
+                    ? $regimesIds[0]
+                    : ($request->regime_alimentaire_id ?? $plat->regime_alimentaire_id),
                 // 'theme_culinaire_id' => $request->theme_culinaire_id ?? $plat->theme_culinaire_id,
             ];
 
@@ -203,6 +244,13 @@ class PlatController extends Controller
             }
 
             $plat->update($updateData);
+
+            // Mettre à jour les régimes multiples si fournis
+            if (is_array($regimesIds)) {
+                $plat->regimesAlimentaires()->sync($regimesIds);
+            }
+
+            $plat->load(['typeDePlat', 'typeDeCuisine', 'regimeAlimentaire', 'regimesAlimentaires']);
 
             return response()->json([
                 'status' => true,

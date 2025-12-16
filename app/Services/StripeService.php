@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use Stripe\StripeClient;
 
 class StripeService
@@ -51,15 +52,34 @@ class StripeService
     /**
      * Créer un compte Connect pour un chef
      */
-    public function createConnectAccount($email, $country = 'FR')
+    public function createConnectAccount(User $user, $country = 'FR')
     {
+        $email = $user->email;
+
         return $this->stripe->accounts->create([
-            'type' => 'express',
-            'country' => $country,
-            'email' => $email,
-            'capabilities' => [
+            'type'          => 'express',
+            'country'       => $country,
+            'email'         => $email,
+            'business_type' => 'individual',
+
+            // Pré-remplir les infos de la personne physique
+            'individual'    => [
+                'email'      => $email,
+                'first_name' => $user->firstNameOrPseudo ?? '',
+                'last_name'  => $user->lastName ?? '',
+            ],
+
+            // Pré-remplir les infos "entreprise" pour éviter à l'hôte de les saisir
+            'business_profile' => [
+                // MCC / secteur d'activité : 5812 = Restaurants
+                'mcc'                 => '5812',
+                'product_description' => 'Plateforme de réservation de chefs à domicile',
+                'url'                 => 'https://www.tabiroo.com',
+            ],
+            
+            'capabilities'  => [
                 'card_payments' => ['requested' => true],
-                'transfers' => ['requested' => true],
+                'transfers'     => ['requested' => true],
             ],
         ]);
     }

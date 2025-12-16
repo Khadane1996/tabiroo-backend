@@ -22,6 +22,7 @@ class Plat extends Model
         'allergene',
         'type_de_plat_id',
         'type_de_cuisine_id',
+        // colonne historique (single FK), gardée pour compatibilité
         'regime_alimentaire_id',
         'theme_culinaire_id'
     ];
@@ -44,6 +45,14 @@ class Plat extends Model
     public function regimeAlimentaire()
     {
         return $this->belongsTo(RegimeAlimentaire::class);
+    }
+
+    /**
+     * Nouveau lien Many-to-Many : un plat peut avoir plusieurs régimes alimentaires.
+     */
+    public function regimesAlimentaires()
+    {
+        return $this->belongsToMany(RegimeAlimentaire::class, 'plat_regime_alimentaire');
     }
 
     public function themeCulinaire()

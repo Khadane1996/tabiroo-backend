@@ -14,4 +14,9 @@ class RegimeAlimentaire extends Model
     protected $fillable = [
         'description'
     ];
+
+    public function plats()
+    {
+        return $this->belongsToMany(Plat::class, 'plat_regime_alimentaire');
+    }
 }
