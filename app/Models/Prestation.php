@@ -62,7 +62,7 @@ class Prestation extends Model
         )->whereIn('status', ['pending', 'accepted']);
     }
 
-    protected $appends = ['places_restantes'];
+    protected $appends = ['places_restantes', 'est_privatisee'];
 
     public function getPlacesRestantesAttribute()
     {
@@ -85,6 +85,17 @@ class Prestation extends Model
     public function reservationsConfirméesTwo()
     {
         return $this->reservations()->where('status', 'confirmed');
+    }
+
+    /**
+     * Indique si la prestation est privatisée (au moins une réservation privée acceptée)
+     */
+    public function getEstPrivatiseeAttribute()
+    {
+        return $this->reservations()
+            ->where('is_private', true)
+            ->whereIn('status', ['accepted'])
+            ->exists();
     }
 
 }

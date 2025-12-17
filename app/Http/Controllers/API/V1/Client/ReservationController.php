@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Reservation;
 use App\Models\Notification;
+use App\Models\MenuPrestation;
 use Illuminate\Support\Facades\DB;
 use App\Services\StripeService;
 use Illuminate\Support\Facades\Log;
@@ -43,13 +44,15 @@ class ReservationController extends Controller
 
             $validate = Validator::make($request->all(), [
                 'menu_prestation_id' => 'required|exists:menu_prestation,id',
-                'client_id' => 'required|exists:users,id',
-                'chef_id' => 'required|exists:users,id',
-                'sous_total' => 'required|string',
-                'frais_service' => 'required|string',
-                'nombre_convive' => 'required|string',
-                'date_prestation' => 'required|string',
-                'choix' => 'required|string',
+                'client_id'          => 'required|exists:users,id',
+                'chef_id'            => 'required|exists:users,id',
+                'sous_total'         => 'required|string',
+                'frais_service'      => 'required|string',
+                'nombre_convive'     => 'required|string',
+                'date_prestation'    => 'required|string',
+                'choix'              => 'required|string',
+                'is_private'         => 'sometimes|boolean',
+                'private_message'    => 'nullable|string|max:255',
             ]);
 
             if ($validate->fails()) {
@@ -60,8 +63,46 @@ class ReservationController extends Controller
                 ], 401);
             }
 
+            // Récupérer la prestation liée pour appliquer les règles de privatisation
+            $menuPrestation = MenuPrestation::findOrFail($request->menu_prestation_id);
+            $prestationId   = $menuPrestation->prestation_id;
+
+            $isPrivate = filter_var($request->input('is_private', false), FILTER_VALIDATE_BOOLEAN);
+
+            // Si une réservation privée a déjà été acceptée pour cette prestation, interdire toute nouvelle réservation
+            $hasPrivateAccepted = Reservation::whereHas('menuPrestation', function ($q) use ($prestationId) {
+                    $q->where('prestation_id', $prestationId);
+                })
+                ->where('is_private', true)
+                ->whereIn('status', ['accepted'])
+                ->exists();
+
+            if ($hasPrivateAccepted) {
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'Cette prestation est déjà privatisée et ne peut plus être réservée.',
+                ], 409);
+            }
+
+            // Si le client demande une privatisation mais qu’il existe déjà des réservations, refuser
+            if ($isPrivate) {
+                $existingReservations = Reservation::whereHas('menuPrestation', function ($q) use ($prestationId) {
+                        $q->where('prestation_id', $prestationId);
+                    })
+                    ->whereIn('status', ['pending', 'accepted', 'upcoming', 'completed'])
+                    ->count();
+
+                if ($existingReservations > 0) {
+                    return response()->json([
+                        'status'  => false,
+                        'message' => 'La privatisation est impossible : des réservations ont déjà été effectuées par d’autres convives.',
+                    ], 409);
+                }
+            }
+
+            // Statut : si privatisation, toujours en attente de validation du chef (même si la prestation est en validation automatique)
             $status = 'pending';
-            if($request->choix === 'oui') {
+            if (!$isPrivate && $request->choix === 'oui') {
                 $status = 'accepted';
             }
 
@@ -74,7 +115,9 @@ class ReservationController extends Controller
                 'nombre_convive' => $request->nombre_convive,
                 'date_prestation' => $request->date_prestation,
                 'transaction_detail' => $request->transaction_detail,
-                'status' => $status
+                'status' => $status,
+                'is_private' => $isPrivate,
+                'private_message' => $request->private_message,
             ]);
 
             Notification::notifyReservation($request->chef_id, $reservation->id);
@@ -113,6 +156,8 @@ class ReservationController extends Controller
             'choix' => 'required|string',
             'chef_stripe_account_id' => 'required|string',
             'amount' => 'required|numeric|min:1', // en euros
+            'is_private' => 'sometimes|boolean',
+            'private_message' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -125,8 +170,46 @@ class ReservationController extends Controller
 
         DB::beginTransaction();
         try {
+            // Récupérer la prestation liée pour appliquer les règles de privatisation
+            $menuPrestation = MenuPrestation::findOrFail($request->menu_prestation_id);
+            $prestationId   = $menuPrestation->prestation_id;
+
+            $isPrivate = filter_var($request->input('is_private', false), FILTER_VALIDATE_BOOLEAN);
+
+            // Si une réservation privée a déjà été acceptée pour cette prestation, interdire toute nouvelle réservation
+            $hasPrivateAccepted = Reservation::whereHas('menuPrestation', function ($q) use ($prestationId) {
+                    $q->where('prestation_id', $prestationId);
+                })
+                ->where('is_private', true)
+                ->whereIn('status', ['accepted'])
+                ->exists();
+
+            if ($hasPrivateAccepted) {
+                return response()->json([
+                    'status'  => false,
+                    'message' => 'Cette prestation est déjà privatisée et ne peut plus être réservée.',
+                ], 409);
+            }
+
+            // Si le client demande une privatisation mais qu’il existe déjà des réservations, refuser
+            if ($isPrivate) {
+                $existingReservations = Reservation::whereHas('menuPrestation', function ($q) use ($prestationId) {
+                        $q->where('prestation_id', $prestationId);
+                    })
+                    ->whereIn('status', ['pending', 'accepted', 'upcoming', 'completed'])
+                    ->count();
+
+                if ($existingReservations > 0) {
+                    return response()->json([
+                        'status'  => false,
+                        'message' => 'La privatisation est impossible : des réservations ont déjà été effectuées par d’autres convives.',
+                    ], 409);
+                }
+            }
+
+            // Statut : si privatisation, toujours en attente de validation du chef (même si la prestation est en validation automatique)
             $status = 'pending';
-            if ($request->choix === 'oui') {
+            if (!$isPrivate && $request->choix === 'oui') {
                 $status = 'accepted';
             }
 
@@ -140,6 +223,8 @@ class ReservationController extends Controller
                 'date_prestation' => $request->date_prestation,
                 'transaction_detail' => null,
                 'status' => $status,
+                'is_private' => $isPrivate,
+                'private_message' => $request->private_message,
             ]);
 
             // Récupérer le client pour attacher un Stripe Customer au PaymentIntent (si disponible)

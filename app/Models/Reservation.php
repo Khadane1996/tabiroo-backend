@@ -26,6 +26,8 @@ class Reservation extends Model
         'distributed_at',
         'motif',
         'status',
+        'is_private',
+        'private_message',
     ];
 
     protected $casts = [
@@ -33,6 +35,7 @@ class Reservation extends Model
         'distributed_at' => 'datetime',
         'chef_amount' => 'decimal:2',
         'commission_amount' => 'decimal:2',
+        'is_private' => 'boolean',
     ];
 
     // Menu prestation liée
