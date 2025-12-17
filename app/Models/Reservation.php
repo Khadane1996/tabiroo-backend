@@ -28,6 +28,11 @@ class Reservation extends Model
         'status',
         'is_private',
         'private_message',
+        'validation_code',
+        'validation_code_used_at',
+        'refund_id',
+        'refunded_at',
+        'auto_cancelled_at',
     ];
 
     protected $casts = [
@@ -36,6 +41,9 @@ class Reservation extends Model
         'chef_amount' => 'decimal:2',
         'commission_amount' => 'decimal:2',
         'is_private' => 'boolean',
+        'validation_code_used_at' => 'datetime',
+        'refunded_at' => 'datetime',
+        'auto_cancelled_at' => 'datetime',
     ];
 
     // Menu prestation liée

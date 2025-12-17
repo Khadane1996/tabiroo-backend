@@ -121,6 +121,10 @@ class ReservationController extends Controller
             ]);
 
             Notification::notifyReservation($request->chef_id, $reservation->id);
+
+            // Notifier le client avec l'adresse du chef
+            $chef = User::with('adresse')->find($request->chef_id);
+            Notification::notifyChefAddressToClient($chef, $reservation);
                 
             return response()->json([
                 'status' => true,
@@ -227,6 +231,10 @@ class ReservationController extends Controller
                 'private_message' => $request->private_message,
             ]);
 
+            // Générer un code de validation (à communiquer au chef après le repas)
+            $reservation->validation_code = (string) random_int(100000, 999999);
+            $reservation->save();
+
             // Récupérer le client pour attacher un Stripe Customer au PaymentIntent (si disponible)
             $customerId = null;
             try {
@@ -241,13 +249,17 @@ class ReservationController extends Controller
                 ]);
             }
 
-            // Créer PaymentIntent avec destination charges (paiement direct au chef)
-            $pi = $this->stripe->createPaymentIntentWithDestination(
+            // Créer un PaymentIntent sur le compte plateforme (mode escrow)
+            $pi = $this->stripe->createEscrowPaymentIntent(
                 $request->amount,
                 'eur',
-                $request->chef_stripe_account_id,
-                $request->frais_service, // Les frais restent sur le compte principal
-                $customerId
+                $customerId,
+                [
+                    'reservation_id' => $reservation->id,
+                    'client_id' => $request->client_id,
+                    'chef_id' => $request->chef_id,
+                    'chef_stripe_account_id' => $request->chef_stripe_account_id,
+                ]
             );
 
             // Stocker l'id du PI sur la réservation
@@ -262,7 +274,12 @@ class ReservationController extends Controller
             ]);
             $reservation->save();
 
-            // Notification::notifyReservation($request->chef_id, $reservation->id);
+            // Notification au chef pour la nouvelle réservation
+            Notification::notifyReservation($request->chef_id, $reservation->id);
+
+            // Notification au client avec l'adresse du chef pour la prestation
+            $chefUser = User::with('adresse')->find($request->chef_id);
+            Notification::notifyChefAddressToClient($chefUser, $reservation);
 
             DB::commit();
 
@@ -311,22 +328,44 @@ class ReservationController extends Controller
         try {
             $reservation = Reservation::findOrFail($id);
 
-            // Vérifier si le client est bien le propriétaire
-            // if ($reservation->client_id !== $request->user()->id) {
-            // if ($reservation->client_id) {
-            //     return response()->json([
-            //         'status' => false,
-            //         'message' => 'Accès non autorisé'
-            //     ], 403);
-            // }
+            $oldStatus = $reservation->status;
 
             $reservation->status = $request->status;
-            if($request->motif){
+            if ($request->motif) {
                 $reservation->motif = $request->motif;
             }
             $reservation->save();
 
-            Notification::notifyReservationAnnuler($reservation->chef_id, $reservation->client_id, $reservation->id);
+            // Notifications en fonction du nouveau statut
+            if ($oldStatus !== $reservation->status) {
+                // Réservation acceptée
+                if ($reservation->status === 'accepted') {
+                    Notification::notifyReservationAcceptedForClient($reservation);
+                    Notification::notifyReservationAcceptedForChef($reservation);
+                }
+                // Réservation annulée
+                if ($reservation->status === 'cancelled') {
+                    Notification::notifyReservationAnnuler($reservation->chef_id, $reservation->client_id, $reservation->id);
+                    Notification::notifyReservationCancelledForClient($reservation);
+                }
+            }
+
+            // Si la réservation est annulée (client ou chef) => rembourser intégralement si possible
+            if ($oldStatus !== 'cancelled' && $reservation->status === 'cancelled') {
+                try {
+                    if ($reservation->payment_intent_id && !$reservation->refunded_at) {
+                        $refund = $this->stripe->refundPaymentIntent($reservation->payment_intent_id);
+                        $reservation->refund_id = $refund->id ?? null;
+                        $reservation->refunded_at = now();
+                        $reservation->save();
+                    }
+                } catch (\Throwable $e) {
+                    Log::error('Erreur lors du remboursement de la réservation annulée', [
+                        'reservation_id' => $reservation->id,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
 
             return response()->json([
                 'status' => true,
@@ -334,6 +373,112 @@ class ReservationController extends Controller
                 'reservation' => $reservation
             ], 200);
 
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Valider une réservation côté chef en saisissant le code communiqué par le client.
+     * Cette action marque la réservation comme terminée et déclenche la distribution du paiement.
+     */
+    public function validateWithCode(Request $request, $id)
+    {
+        $request->validate([
+            'code' => 'required|string',
+        ]);
+
+        try {
+            $user = $request->user();
+            $reservation = Reservation::with('chef')->findOrFail($id);
+
+            if (!$user || $user->id !== $reservation->chef_id) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Accès non autorisé pour cette réservation',
+                ], 403);
+            }
+
+            if (!in_array($reservation->status, ['accepted', 'upcoming'])) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Cette réservation ne peut pas être validée dans son état actuel.',
+                ], 422);
+            }
+
+            if (!$reservation->validation_code) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Aucun code de validation n’est associé à cette réservation.',
+                ], 400);
+            }
+
+            if ($reservation->validation_code !== $request->code) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Code de validation incorrect.',
+                ], 400);
+            }
+
+            if ($reservation->payment_distributed) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Le paiement a déjà été distribué pour cette réservation.',
+                ], 400);
+            }
+
+            if (!$reservation->payment_intent_id) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Aucun paiement n’est associé à cette réservation.',
+                ], 400);
+            }
+
+            $chef = $reservation->chef;
+            if (!$chef || !$chef->stripe_account_id) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Le chef n’a pas de compte Stripe valide pour recevoir le paiement.',
+                ], 400);
+            }
+
+            try {
+                $transfer = $this->stripe->transferToChef(
+                    $reservation->payment_intent_id,
+                    $chef->stripe_account_id,
+                    (float) $reservation->chef_amount,
+                    'reservation_'.$reservation->id
+                );
+
+                $reservation->payment_distributed = true;
+                $reservation->transfer_id = $transfer->id ?? null;
+                $reservation->distributed_at = now();
+                $reservation->status = 'completed';
+                $reservation->validation_code_used_at = now();
+                $reservation->save();
+
+                // Notifier le chef que le paiement a été distribué
+                Notification::notifyPaymentDistributed($reservation->chef_id, $reservation->id);
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Réservation validée et paiement distribué avec succès.',
+                    'reservation' => $reservation,
+                ], 200);
+            } catch (\Throwable $e) {
+                Log::error('Erreur lors de la distribution du paiement Stripe', [
+                    'reservation_id' => $reservation->id,
+                    'error' => $e->getMessage(),
+                ]);
+
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Impossible de distribuer le paiement au chef.',
+                ], 500);
+            }
         } catch (\Throwable $th) {
             return response()->json([
                 'status' => false,

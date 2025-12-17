@@ -16,8 +16,9 @@ class StripeService
 
 
     /**
-     * Créer un PaymentIntent avec destination (alternative recommandée)
-     * Cette méthode fait apparaître immédiatement la transaction dans le dashboard du chef
+     * Créer un PaymentIntent avec destination (paiement direct au chef)
+     * ⚠️ Conservé pour compatibilité, mais le nouveau flux escrow
+     * utilise createEscrowPaymentIntent() sans transfert direct.
      */
     public function createPaymentIntentWithDestination($amount, $currency = 'eur', $chefStripeId = null, $applicationFee = null, $customerId = null)
     {
@@ -46,6 +47,33 @@ class StripeService
             }
         }
         
+        return $this->stripe->paymentIntents->create($params);
+    }
+
+    /**
+     * Créer un PaymentIntent \"escrow\" sur le compte plateforme
+     * - Aucun transfer_data ni application_fee
+     * - L'argent est encaissé par la plateforme puis redistribué plus tard
+     */
+    public function createEscrowPaymentIntent(
+        float $amount,
+        string $currency = 'eur',
+        ?string $customerId = null,
+        array $metadata = []
+    ) {
+        $amountCents = intval($amount * 100);
+
+        $params = [
+            'amount' => $amountCents,
+            'currency' => $currency,
+            'payment_method_types' => ['card'],
+            'metadata' => $metadata,
+        ];
+
+        if ($customerId) {
+            $params['customer'] = $customerId;
+        }
+
         return $this->stripe->paymentIntents->create($params);
     }
 
@@ -138,6 +166,48 @@ class StripeService
     public function retrievePaymentIntent(string $paymentIntentId)
     {
         return $this->stripe->paymentIntents->retrieve($paymentIntentId);
+    }
+
+    /**
+     * Créer un remboursement intégral lié à un PaymentIntent
+     */
+    public function refundPaymentIntent(string $paymentIntentId)
+    {
+        return $this->stripe->refunds->create([
+            'payment_intent' => $paymentIntentId,
+        ]);
+    }
+
+    /**
+     * Effectuer un virement vers le compte Stripe Connect d'un chef
+     * à partir d'un PaymentIntent encaissé sur la plateforme.
+     */
+    public function transferToChef(
+        string $paymentIntentId,
+        string $chefStripeAccountId,
+        float $amount,
+        ?string $transferGroup = null
+    ) {
+        $paymentIntent = $this->stripe->paymentIntents->retrieve($paymentIntentId);
+        $amountCents = intval($amount * 100);
+
+        $chargeId = $paymentIntent->latest_charge ?? null;
+
+        $params = [
+            'amount' => $amountCents,
+            'currency' => $paymentIntent->currency,
+            'destination' => $chefStripeAccountId,
+        ];
+
+        if ($chargeId) {
+            $params['source_transaction'] = $chargeId;
+        }
+
+        if ($transferGroup) {
+            $params['transfer_group'] = $transferGroup;
+        }
+
+        return $this->stripe->transfers->create($params);
     }
 
 }

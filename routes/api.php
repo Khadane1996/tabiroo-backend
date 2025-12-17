@@ -112,6 +112,10 @@ Route::prefix('client')->group(function () {
     Route::get("/reservation-chef/{user_id}", [ReservationController::class, "getReservationForChef"]);
 
     Route::get("/notifications/{user_id}", [ReservationController::class, "getNotication"]);
+
+    // Validation d'une réservation par le chef via code communiqué par le client
+    Route::post("/reservation/{id}/validate-code", [ReservationController::class, "validateWithCode"])
+        ->middleware('auth:sanctum');
 });
 
 Route::get("/tableau-bord/{user_id}", [TableauBordController::class, "index"]);
