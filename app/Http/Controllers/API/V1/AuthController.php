@@ -292,6 +292,8 @@ class AuthController extends Controller
                     'adresse' => $user->adresse,
                     'bancaire' => $user->bancaire,
                     'stripe_account_id' => $user->stripe_account_id,
+                    'hygiene_qcm_badge_level' => $user->hygiene_qcm_badge_level,
+                    'hospitalite_qcm_badge_level' => $user->hospitalite_qcm_badge_level,
                 ],
             ], 200);
 
@@ -607,6 +609,7 @@ class AuthController extends Controller
                 return response()->json(['error' => 'Token Google invalide'], 401);
             }
 
+            // Créer ou récupérer l'utilisateur à partir de son email Google
             $user = User::firstOrCreate(
                 ['email' => $googleUser['email']],
                 [
@@ -616,6 +619,20 @@ class AuthController extends Controller
                 ]
             );
 
+            // Si c'est une nouvelle inscription, créer aussi les entrées associées
+            if ($user->wasRecentlyCreated) {
+                Adresse::create([
+                    'user_id' => $user->id,
+                ]);
+
+                Bancaire::create([
+                    'user_id' => $user->id,
+                ]);
+            }
+
+            // Charger les relations pour renvoyer les mêmes infos que /login
+            $user->load(['adresse', 'bancaire']);
+
             $token = $user->createToken("auth_token")->plainTextToken;
 
             return response()->json([
@@ -624,10 +641,17 @@ class AuthController extends Controller
                 'token' => $token,
                 'user' => [
                     'id' => $user->id,
+                    'photo_url' => $user->photo_url,
                     'firstNameOrPseudo' => $user->firstNameOrPseudo,
                     'lastName' => $user->lastName,
                     'email' => $user->email,
                     'phone' => $user->phone,
+                    'biographie' => $user->biographie,
+                    'adresse' => $user->adresse,
+                    'bancaire' => $user->bancaire,
+                    'stripe_account_id' => $user->stripe_account_id,
+                    'hygiene_qcm_badge_level' => $user->hygiene_qcm_badge_level,
+                    'hospitalite_qcm_badge_level' => $user->hospitalite_qcm_badge_level,
                 ],
             ], 200);
             
@@ -703,6 +727,20 @@ class AuthController extends Controller
                 ]
             );
 
+            // Si c'est une nouvelle inscription, créer aussi les entrées associées
+            if ($user->wasRecentlyCreated) {
+                Adresse::create([
+                    'user_id' => $user->id,
+                ]);
+
+                Bancaire::create([
+                    'user_id' => $user->id,
+                ]);
+            }
+
+            // Charger les relations pour renvoyer les mêmes infos que /login
+            $user->load(['adresse', 'bancaire']);
+
             $token = $user->createToken("auth_token")->plainTextToken;
 
             return response()->json([
@@ -711,10 +749,17 @@ class AuthController extends Controller
                 'token' => $token,
                 'user' => [
                     'id' => $user->id,
+                    'photo_url' => $user->photo_url,
                     'firstNameOrPseudo' => $user->firstNameOrPseudo,
                     'lastName' => $user->lastName,
                     'email' => $user->email,
                     'phone' => $user->phone,
+                    'biographie' => $user->biographie,
+                    'adresse' => $user->adresse,
+                    'bancaire' => $user->bancaire,
+                    'stripe_account_id' => $user->stripe_account_id,
+                    'hygiene_qcm_badge_level' => $user->hygiene_qcm_badge_level,
+                    'hospitalite_qcm_badge_level' => $user->hospitalite_qcm_badge_level,
                 ],
             ], 200);
 

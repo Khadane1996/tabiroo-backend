@@ -206,4 +206,66 @@ class ProfilController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Met à jour les badges QCM (Hygiène / Hospitalité) pour l'utilisateur connecté.
+     * Les niveaux ne diminuent jamais : on prend le max entre la valeur actuelle et la nouvelle.
+     */
+    public function updateQcmBadges(Request $request)
+    {
+        try {
+            $user = Auth::user();
+
+            if (!$user) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Utilisateur non authentifié',
+                ], 401);
+            }
+
+            $validate = Validator::make($request->all(), [
+                'hygiene_level' => 'nullable|integer|min:0',
+                'hospitalite_level' => 'nullable|integer|min:0',
+            ]);
+
+            if ($validate->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Erreur de validation',
+                    'errors' => $validate->errors(),
+                ], 422);
+            }
+
+            if ($request->has('hygiene_level')) {
+                $user->hygiene_qcm_badge_level = max(
+                    (int) ($user->hygiene_qcm_badge_level ?? 0),
+                    (int) $request->hygiene_level
+                );
+            }
+
+            if ($request->has('hospitalite_level')) {
+                $user->hospitalite_qcm_badge_level = max(
+                    (int) ($user->hospitalite_qcm_badge_level ?? 0),
+                    (int) $request->hospitalite_level
+                );
+            }
+
+            $user->save();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Badges QCM mis à jour avec succès',
+                'user' => [
+                    'id' => $user->id,
+                    'hygiene_qcm_badge_level' => $user->hygiene_qcm_badge_level,
+                    'hospitalite_qcm_badge_level' => $user->hospitalite_qcm_badge_level,
+                ],
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Une erreur est survenue : ' . $th->getMessage(),
+            ], 500);
+        }
+    }
 }

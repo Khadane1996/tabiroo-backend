@@ -31,6 +31,8 @@ class User extends Authenticatable
         'password',
         'stripe_account_id',
         'stripe_customer_id',
+        'hygiene_qcm_badge_level',
+        'hospitalite_qcm_badge_level',
     ];
 
     /**
