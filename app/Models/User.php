@@ -33,6 +33,7 @@ class User extends Authenticatable
         'stripe_customer_id',
         'hygiene_qcm_badge_level',
         'hospitalite_qcm_badge_level',
+        'is_admin',
     ];
 
     /**
@@ -55,6 +56,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
         ];
     }
 

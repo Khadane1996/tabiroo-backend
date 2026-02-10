@@ -34,120 +34,52 @@
     <main>
         <div class="blog">
             <h1>A la une</h1>
-            <div class="blog-hero"> 
+            <div class="blog-hero">
                 <h1>Tabiroo : découvrez l’expérience unique des repas faits maison</h1>
-                <p>Bien plus qu’un repas, Tabiroo vous invite à partager des saveurs authentiques et des moments chaleureux chez des hôtes passionnés.</p> 
+                <p>Bien plus qu’un repas, Tabiroo vous invite à partager des saveurs authentiques et des moments
+                    chaleureux chez des hôtes passionnés.</p>
             </div>
             <div class="third">
                 <h1>Découvrez également</h1>
                 <div class="une">
-                    <div class="articles">
-                        <img src="{{ asset('images/article1.svg') }}" alt="">
-                        <h3>Lorem ipsum dolor sit.</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. </p>
-                        <a href="{{ url('/article-detail') }}">Lire l'article</a>
-                    </div>
-                    <div class="articles">
-                        <img src="{{ asset('images/article2.svg') }}" alt="">
-                        <h3>Lorem ipsum dolor sit.</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. </p>
-                        <a href="#">Lire l'article</a>
-                    </div>
-                    <div class="articles">
-                        <img src="{{ asset('images/article3.svg') }}" alt="">
-                        <h3>Lorem ipsum dolor sit.</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. </p>
-                        <a href="#">Lire l'article</a>
-                    </div>
-                    <div class="articles">
-                        <img src="{{ asset('images/article4.svg') }}" alt="">
-                        <h3>Lorem ipsum dolor sit.</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. </p>
-                        <a href="#">Lire l'article</a>
-                    </div>
-                    <div class="articles">
-                        <img src="{{ asset('images/article4.svg') }}" alt="">
-                        <h3>Lorem ipsum dolor sit.</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. </p>
-                        <a href="#">Lire l'article</a>
-                    </div>
-                    <div class="articles">
-                        <img src="{{ asset('images/article2.svg') }}" alt="">
-                        <h3>Lorem ipsum dolor sit.</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. </p>
-                        <a href="#">Lire l'article</a>
-                    </div>
-                    <div class="articles">
-                        <img src="{{ asset('images/article1.svg') }}" alt="">
-                        <h3>Lorem ipsum dolor sit.</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. </p>
-                        <a href="#">Lire l'article</a>
-                    </div>
-                    <div class="articles">
-                        <img src="{{ asset('images/article2.svg') }}" alt="">
-                        <h3>Lorem ipsum dolor sit.</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. </p>
-                        <a href="#">Lire l'article</a>
-                    </div>
-                    <div class="articles">
-                        <img src="{{ asset('images/article3.svg') }}" alt="">
-                        <h3>Lorem ipsum dolor sit.</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. </p>
-                        <a href="#">Lire l'article</a>
-                    </div>
-                    <div class="articles">
-                        <img src="{{ asset('images/article1.svg') }}" alt="">
-                        <h3>Lorem ipsum dolor sit.</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. </p>
-                        <a href="#">Lire l'article</a>
-                    </div>
-                    <div class="articles">
-                        <img src="{{ asset('images/article2.svg') }}" alt="">
-                        <h3>Lorem ipsum dolor sit.</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. </p>
-                        <a href="#">Lire l'article</a>
-                    </div>
-                    <div class="articles">
-                        <img src="{{ asset('images/article3.svg') }}" alt="">
-                        <h3>Lorem ipsum dolor sit.</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. </p>
-                        <a href="#">Lire l'article</a>
-                    </div>
-                    <div class="articles">
-                        <img src="{{ asset('images/article1.svg') }}" alt="">
-                        <h3>Lorem ipsum dolor sit.</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. </p>
-                        <a href="#">Lire l'article</a>
-                    </div>
-                    <div class="articles">
-                        <img src="{{ asset('images/article2.svg') }}" alt="">
-                        <h3>Lorem ipsum dolor sit.</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. </p>
-                        <a href="#">Lire l'article</a>
-                    </div>
-                    <div class="articles">
-                        <img src="{{ asset('images/article1.svg') }}" alt="">
-                        <h3>Lorem ipsum dolor sit.</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. </p>
-                        <a href="#">Lire l'article</a>
-                    </div>
-                    <div class="articles">
-                        <img src="{{ asset('images/article2.svg') }}" alt="">
-                        <h3>Lorem ipsum dolor sit.</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. </p>
-                        <a href="#">Lire l'article</a>
-                    </div>
+                    @forelse ($posts as $post)
+                        <div class="articles">
+                            <img src="{{ $post->image_path ? asset($post->image_path) : asset('images/article1.svg') }}"
+                                alt="{{ $post->title }}">
+                            <h3>{{ $post->title }}</h3>
+                            <p>{{ $post->excerpt }}</p>
+                            <a href="{{ route('blog.show', $post->slug) }}">Lire l'article</a>
+                        </div>
+                    @empty
+                        <p>Aucun article publié pour le moment.</p>
+                    @endforelse
                 </div>
-                <div class="pagination">
-                    <button class="prev-page">‹</button>
-                    <button class="page-number active">1</button>
-                    <button class="page-number">2</button>
-                    <span>...</span>
-                    <button class="page-number">3</button>
-                    <button class="page-number">4</button>
-                    <button class="next-page">›</button>
-                </div>                
-                
+
+                @if ($posts instanceof \Illuminate\Pagination\LengthAwarePaginator && $posts->hasPages())
+                    <div class="pagination">
+                        {{-- Simple pagination en gardant le style existant --}}
+                        @if ($posts->onFirstPage())
+                            <button class="prev-page" disabled>‹</button>
+                        @else
+                            <a class="prev-page" href="{{ $posts->previousPageUrl() }}">‹</a>
+                        @endif
+
+                        @foreach ($posts->getUrlRange(1, $posts->lastPage()) as $page => $url)
+                            @if ($page == $posts->currentPage())
+                                <button class="page-number active">{{ $page }}</button>
+                            @else
+                                <a class="page-number" href="{{ $url }}">{{ $page }}</a>
+                            @endif
+                        @endforeach
+
+                        @if ($posts->hasMorePages())
+                            <a class="next-page" href="{{ $posts->nextPageUrl() }}">›</a>
+                        @else
+                            <button class="next-page" disabled>›</button>
+                        @endif
+                    </div>
+                @endif
+
             </div>
         </div>
         

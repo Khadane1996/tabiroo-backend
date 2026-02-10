@@ -126,38 +126,26 @@
                     </div>
                 </div>      
             </div>
-            <div class="third">
-                <h1> À la Une</h1>
-                <div class="une">
-                    <div class="articles">
-                        <img src="{{ asset('images/article1.svg') }}" alt="">
-                        <h3>Lorem ipsum dolor sit.</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. </p>
-                        <a href="{{ url('/article-detail') }}">Lire l'article</a>
+            @if(isset($homeFeaturedPosts) && $homeFeaturedPosts->count())
+                <div class="third">
+                    <h1> À la Une</h1>
+                    <div class="une">
+                        @foreach ($homeFeaturedPosts as $post)
+                            <div class="articles">
+                                <img src="{{ $post->image_path ? asset($post->image_path) : asset('images/article1.svg') }}"
+                                    alt="{{ $post->title }}">
+                                <h3>{{ $post->title }}</h3>
+                                <p>{{ $post->excerpt }}</p>
+                                <a href="{{ route('blog.show', $post->slug) }}">Lire l'article</a>
+                            </div>
+                        @endforeach
                     </div>
-                    <div class="articles">
-                        <img src="{{ asset('images/article2.svg') }}" alt="">
-                        <h3>Lorem ipsum dolor sit.</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. </p>
-                        <a href="#">Lire l'article</a>
-                    </div>
-                    <div class="articles">
-                        <img src="{{ asset('images/article3.svg') }}" alt="">
-                        <h3>Lorem ipsum dolor sit.</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. </p>
-                        <a href="#">Lire l'article</a>
-                    </div>
-                    <div class="articles">
-                        <img src="{{ asset('images/article4.svg') }}" alt="">
-                        <h3>Lorem ipsum dolor sit.</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum. </p>
-                        <a href="#">Lire l'article</a>
-                    </div>
+                    <button onclick="window.location.href='{{ route('blog.index') }}'">
+                        Accéder au blog
+                        <img src="{{ asset('images/arrow.svg') }}" alt="">
+                    </button>
                 </div>
-                <button>Accéder au blog
-                    <img src="{{ asset('images/arrow.svg') }}" alt="">
-                </button>
-            </div>
+            @endif
             <div class="four">
                 <h1>Ils ont goûté à l'expérience</h1>
                 <div class="temoignages-container">

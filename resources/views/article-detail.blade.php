@@ -32,59 +32,37 @@
     <main>
         <div class="article-layout">
             <section class="article-main">
-                <h1 class="titre-article">La restauration à domicile : un service gastronomique sur-mesure pour chaque occasion</h1>
+                <h1 class="titre-article">{{ $post->title }}</h1>
                 <div class="meta-article">
-                    <span class="auteur-article">Laurant Gillet</span>
-                    <span class="date-article">10 février 2025</span>
+                    <span class="auteur-article">{{ $post->author_name }}</span>
+                    <span class="date-article">
+                        {{ optional($post->published_at)->format('d/m/Y') }}
+                    </span>
                     <span class="social-icons">
-                        <img src="{{ asset('images/icon-link.svg') }}" alt="Facebook">
+                        <img src="{{ asset('images/icon-link.svg') }}" alt="Lien">
                         <img src="{{ asset('images/icon-facebook.svg') }}" alt="Facebook">
                         <img src="{{ asset('images/icon-x.svg') }}" alt="X">
                         <img src="{{ asset('images/icon-linkedin.svg') }}" alt="LinkedIn">
                         <img src="{{ asset('images/icon-instagram.svg') }}" alt="Instagram">
                     </span>
                 </div>
-                <img class="image-article" src="{{ asset('images/article2.svg') }}" alt="Image de l'article">
+                <img class="image-article"
+                    src="{{ $post->image_path ? asset($post->image_path) : asset('images/article2.svg') }}"
+                    alt="Image de l'article">
                 <div class="contenu-article">
-                    <h2>Introduction :</h2>
-                    <p>Dans un monde où le temps est une ressource précieuse, la restauration à domicile émerge comme une solution idéale pour savourer des repas de qualité sans avoir à quitter le confort de sa maison. Que ce soit pour un dîner romantique, une fête entre amis, un événement professionnel ou même un repas quotidien, la cuisine à domicile apporte une expérience culinaire unique, adaptée à chaque besoin.</p>
-                    <h2>Un service personnalisé pour chaque occasion :</h2>
-                    <p>L'un des principaux avantages de la restauration à domicile est la possibilité de personnaliser chaque repas. Vous choisissez non seulement le menu, mais également les détails qui le rendent unique : des recettes végétariennes, sans gluten, ou même adaptées aux régimes spécifiques comme le keto ou le véganisme. Les chefs à domicile prennent le temps de comprendre vos préférences et vos besoins pour créer un repas qui vous ressemble.</p>
-                    <img class="image-article" src="{{ asset('images/article3.svg') }}" alt="Image de l'article">
-                    <h2>La cuisine raffinée sans effort :</h2>
-                    <p>L'un des grands avantages de faire appel à un service de restauration à domicile est la liberté totale de profiter de vos invités ou de votre famille sans avoir à vous soucier des préparatifs ou de la vaisselle. Le chef s'occupe de tout : préparation des plats, cuisson, dressage et nettoyage après le repas. Vous n'avez qu'à savourer le moment.</p>
-                    <img class="image-article" src="{{ asset('images/article4.svg') }}" alt="Image de l'article">
-                    <h2>Un choix pratique pour les repas quotidiens :</h2>
-                    <p>Outre les occasions spéciales, la restauration à domicile est également une solution idéale pour simplifier votre quotidien. Beaucoup de services proposent des livraisons régulières de repas préparés, adaptés à vos goûts et à votre emploi du temps.</p>
-                    <h2>Conclusion :</h2>
-                    <p>La restauration à domicile transforme la manière dont nous vivons l'expérience culinaire. Que ce soit pour une soirée intime, un repas d'affaires ou une simple envie de bien manger chez soi, ce service permet de combiner confort, qualité et personnalisation.</p>
+                    {!! $post->content !!}
                 </div>
             </section>
             <aside class="article-sidebar">
-                <div class="suggestion-article">
-                    <img src="{{ asset('images/article1.svg') }}" alt="Suggestion 1">
-                    <h3>Lorem ipsum dolor sit.</h3>
-                    <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum.</p>
-                    <a href="#">Lire l'article</a>
-                </div>
-                <div class="suggestion-article">
-                    <img src="{{ asset('images/article2.svg') }}" alt="Suggestion 1">
-                    <h3>Lorem ipsum dolor sit.</h3>
-                    <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum.</p>
-                    <a href="#">Lire l'article</a>
-                </div>
-                <div class="suggestion-article">
-                    <img src="{{ asset('images/article3.svg') }}" alt="Suggestion 2">
-                    <h3>Lorem ipsum dolor sit.</h3>
-                    <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum.</p>
-                    <a href="#">Lire l'article</a>
-                </div>
-                <div class="suggestion-article">
-                    <img src="{{ asset('images/article4.svg') }}" alt="Suggestion 3">
-                    <h3>Lorem ipsum dolor sit.</h3>
-                    <p>Lorem ipsum dolor sit amet consectetur. Auctor id in eget nunc fermentum.</p>
-                    <a href="#">Lire l'article</a>
-                </div>
+                @foreach ($suggestedPosts as $suggested)
+                    <div class="suggestion-article">
+                        <img src="{{ $suggested->image_path ? asset($suggested->image_path) : asset('images/article1.svg') }}"
+                            alt="{{ $suggested->title }}">
+                        <h3>{{ $suggested->title }}</h3>
+                        <p>{{ $suggested->excerpt }}</p>
+                        <a href="{{ route('blog.show', $suggested->slug) }}">Lire l'article</a>
+                    </div>
+                @endforeach
             </aside>
         </div>
     </main>

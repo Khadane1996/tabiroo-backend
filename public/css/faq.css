@@ -84,6 +84,32 @@
     display: block;
 }
 
+/* Chronologie / étapes numérotées dans les réponses */
+.faq-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.faq-step-icon {
+    min-width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: #dd6600;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+}
+
+.faq-step p {
+    margin: 0;
+}
+
 /* Bannière apps */
 .faq-apps-banner-wrapper {
     background: none;

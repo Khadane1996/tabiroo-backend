@@ -1,6 +1,12 @@
 <?php
 
+use App\Http\Controllers\Admin\AuthController as AdminAuthController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\PostController as AdminPostController;
+use App\Http\Controllers\BlogController;
+use App\Http\Middleware\AdminAuthenticate;
 use App\Mail\ConfirmRegistrationMail;
+use App\Models\Post;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
@@ -20,16 +26,24 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::get('/', function () {
-    return view('index');
+    $homeFeaturedPosts = Post::published()
+        ->where('is_featured', true)
+        ->latest('published_at')
+        ->limit(4)
+        ->get();
+
+    return view('index', [
+        'homeFeaturedPosts' => $homeFeaturedPosts,
+    ]);
 });
 
 Route::get('/about', function () {
     return view('about');
 });
 
-Route::get('/blog', function () {
-    return view('blog');
-});
+// Blog public
+Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
 Route::get('/contact', function () {
     return view('contact');
@@ -39,8 +53,9 @@ Route::get('/faq', function () {
     return view('faq');
 });
 
+// Ancienne route de détail d'article : redirigée vers le blog
 Route::get('/article-detail', function () {
-    return view('article-detail');
+    return redirect()->route('blog.index');
 });
 
 // Nouvelles routes pour les pages légales
@@ -58,4 +73,19 @@ Route::get('/cookies-settings', function () {
 
 Route::get('/hygiene-security', function () {
     return view('hygiene-security');
+});
+
+// Routes Admin (dashboard + gestion des articles)
+Route::prefix('admin')->name('admin.')->group(function () {
+    // Authentification admin
+    Route::get('login', [AdminAuthController::class, 'showLoginForm'])->name('login');
+    Route::post('login', [AdminAuthController::class, 'login'])->name('login.submit');
+
+    Route::middleware(AdminAuthenticate::class)->group(function () {
+        Route::post('logout', [AdminAuthController::class, 'logout'])->name('logout');
+
+        Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+        Route::resource('posts', AdminPostController::class)->except(['show']);
+    });
 });
