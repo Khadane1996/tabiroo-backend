@@ -34,6 +34,15 @@
     font-weight: 200;
 }
 
+.blog-hero .hero-link {
+    position: absolute;
+    left: 5%;
+    bottom: 2%;
+    color: white;
+    text-decoration: underline;
+    font-weight: 600;
+}
+
 .third{
     width: 100% !important;
 }
@@ -164,7 +173,8 @@
     
     .articles img {
         width: 100%;
-        height: auto;
+        height: 200px;
+        object-fit: cover;
     }
     
     .articles h3 {
@@ -243,7 +253,8 @@
     
     .articles img {
         width: 100%;
-        height: auto;
+        height: 180px;
+        object-fit: cover;
         border-radius: 10px;
     }
     
@@ -334,7 +345,8 @@
     
     .articles img {
         width: 100%;
-        height: auto;
+        height: 160px;
+        object-fit: cover;
         border-radius: 8px;
     }
     

@@ -11,12 +11,21 @@ class BlogController extends Controller
      */
     public function index()
     {
-        // Tous les articles publiés, y compris ceux marqués "À la une"
-        $posts = Post::published()
-            ->orderByDesc('published_at')
-            ->paginate(9);
+        // Article à la une (un seul possible)
+        $featuredPost = Post::published()
+            ->where('is_featured', true)
+            ->latest('published_at')
+            ->first();
+
+        // Articles publiés, excluant celui à la une pour éviter la duplication
+        $postsQuery = Post::published()->orderByDesc('published_at');
+        if ($featuredPost) {
+            $postsQuery->where('id', '<>', $featuredPost->id);
+        }
+        $posts = $postsQuery->paginate(9);
 
         return view('blog', [
+            'featuredPost' => $featuredPost,
             'posts' => $posts,
         ]);
     }

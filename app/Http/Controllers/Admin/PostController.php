@@ -40,6 +40,11 @@ class PostController extends Controller
         // Normalisation du flag "À la une"
         $data['is_featured'] = $request->boolean('is_featured');
 
+        // Si on met à la une : retirer l'ancien bloc à la une (un seul autorisé)
+        if ($data['is_featured']) {
+            Post::where('is_featured', true)->update(['is_featured' => false]);
+        }
+
         Post::create($data);
 
         return redirect()->route('admin.posts.index')
@@ -67,6 +72,11 @@ class PostController extends Controller
 
         // Normalisation du flag "À la une" (permet de le désactiver)
         $data['is_featured'] = $request->boolean('is_featured');
+
+        // Si on met à la une : retirer l'ancien bloc à la une (un seul autorisé)
+        if ($data['is_featured']) {
+            Post::where('is_featured', true)->where('id', '<>', $post->id)->update(['is_featured' => false]);
+        }
 
         $post->update($data);
 

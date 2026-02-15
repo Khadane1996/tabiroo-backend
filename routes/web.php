@@ -26,14 +26,13 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::get('/', function () {
-    $homeFeaturedPosts = Post::published()
-        ->where('is_featured', true)
+    $homeArticles = Post::published()
         ->latest('published_at')
         ->limit(4)
         ->get();
 
     return view('index', [
-        'homeFeaturedPosts' => $homeFeaturedPosts,
+        'homeArticles' => $homeArticles,
     ]);
 });
 

@@ -334,6 +334,16 @@ class ReservationController extends Controller
             if ($request->motif) {
                 $reservation->motif = $request->motif;
             }
+            // Tracker annulation pour stats admin (qui a annulé, quand)
+            if ($oldStatus !== 'cancelled' && $request->status === 'cancelled') {
+                $reservation->cancelled_at = now();
+                $user = $request->user();
+                if ($user) {
+                    $reservation->cancelled_by = $user->id === $reservation->client_id ? 'client' : ($user->id === $reservation->chef_id ? 'chef' : 'system');
+                } else {
+                    $reservation->cancelled_by = $reservation->auto_cancelled_at ? 'system' : null;
+                }
+            }
             $reservation->save();
 
             // Notifications en fonction du nouveau statut

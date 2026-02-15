@@ -33,6 +33,8 @@ class Reservation extends Model
         'refund_id',
         'refunded_at',
         'auto_cancelled_at',
+        'cancelled_at',
+        'cancelled_by',
     ];
 
     protected $casts = [
@@ -44,6 +46,7 @@ class Reservation extends Model
         'validation_code_used_at' => 'datetime',
         'refunded_at' => 'datetime',
         'auto_cancelled_at' => 'datetime',
+        'cancelled_at' => 'datetime',
     ];
 
     // Menu prestation liée

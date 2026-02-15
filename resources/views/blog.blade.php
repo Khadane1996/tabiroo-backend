@@ -33,12 +33,14 @@
 
     <main>
         <div class="blog">
-            <h1>A la une</h1>
-            <div class="blog-hero">
-                <h1>Tabiroo : découvrez l’expérience unique des repas faits maison</h1>
-                <p>Bien plus qu’un repas, Tabiroo vous invite à partager des saveurs authentiques et des moments
-                    chaleureux chez des hôtes passionnés.</p>
-            </div>
+            @if(isset($featuredPost) && $featuredPost)
+                <h1>A la une</h1>
+                <div class="blog-hero" @if($featuredPost->image_path) style="background-image: url('{{ asset($featuredPost->image_path) }}');" @endif>
+                    <h1>{{ $featuredPost->title }}</h1>
+                    <p>{{ $featuredPost->excerpt }}</p>
+                    <a href="{{ route('blog.show', $featuredPost->slug) }}" class="hero-link">Lire l'article</a>
+                </div>
+            @endif
             <div class="third">
                 <h1>Découvrez également</h1>
                 <div class="une">

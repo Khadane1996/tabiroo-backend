@@ -126,11 +126,11 @@
                     </div>
                 </div>      
             </div>
-            @if(isset($homeFeaturedPosts) && $homeFeaturedPosts->count())
+            @if(isset($homeArticles) && $homeArticles->count())
                 <div class="third">
-                    <h1> À la Une</h1>
+                    <h1>Article</h1>
                     <div class="une">
-                        @foreach ($homeFeaturedPosts as $post)
+                        @foreach ($homeArticles as $post)
                             <div class="articles">
                                 <img src="{{ $post->image_path ? asset($post->image_path) : asset('images/article1.svg') }}"
                                     alt="{{ $post->title }}">
