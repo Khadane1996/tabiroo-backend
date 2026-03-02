@@ -41,6 +41,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post("/update-profile", [AuthController::class, "updateProfile"]);
     Route::post("/update-adresse", [ProfilController::class, "updateAdresse"]);
     Route::post("/qcm-badges", [ProfilController::class, "updateQcmBadges"]);
+    Route::post("/push-token", [AuthController::class, "storePushToken"]);
 });
 
 Route::post("/update-bancaire", [ProfilController::class, "updateBancaire"]);
@@ -52,6 +53,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('plats')->group(function () {
         Route::get('/', [PlatController::class, 'index']);
         Route::post('/', [PlatController::class, 'store']);
+        Route::get('/{id}/check-usage', [PlatController::class, 'checkUsage']);
         Route::get('/{id}', [PlatController::class, 'show']);
         Route::post('/update/{id}', [PlatController::class, 'update']);
         Route::delete('/{id}', [PlatController::class, 'destroy']);
@@ -61,6 +63,7 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('menus')->group(function () {
         Route::get('/', [MenuController::class, 'index']); // Récupérer tous les menus
+        Route::get('{id}/check-usage', [MenuController::class, 'checkUsage']); // Vérifier l'usage
         Route::get('{id}', [MenuController::class, 'show']); // Afficher un menu spécifique
         Route::post('/', [MenuController::class, 'store']); // Créer un menu
         Route::post('/update/{id}', [MenuController::class, 'update']); // Mettre à jour un menu
@@ -77,11 +80,12 @@ Route::get("/ambiance-animations", [DataSeedController::class, "ambianceAnimatio
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('prestations')->group(function () {
-        Route::get('/', [PrestationController::class, 'index']); // Récupérer tous les menus
-        Route::get('{id}', [PrestationController::class, 'show']); // Afficher un menu spécifique
-        Route::post('/', [PrestationController::class, 'store']); // Créer un menu
-        Route::put('{id}', [PrestationController::class, 'update']); // Mettre à jour un menu
-        Route::delete('{id}', [PrestationController::class, 'destroy']); // Supprimer un menu
+        Route::get('/', [PrestationController::class, 'index']);
+        Route::get('{id}/check-reservations', [PrestationController::class, 'checkReservations']);
+        Route::get('{id}', [PrestationController::class, 'show']);
+        Route::post('/', [PrestationController::class, 'store']);
+        Route::put('{id}', [PrestationController::class, 'update']);
+        Route::delete('{id}', [PrestationController::class, 'destroy']);
     });
 });
 

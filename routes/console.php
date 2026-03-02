@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 use App\Models\Reservation;
 use App\Services\StripeService;
 use Illuminate\Support\Facades\Log;
@@ -45,3 +46,9 @@ Artisan::command('reservations:auto-cancel', function () {
 
     $this->info('Traitement des réservations en attente terminé.');
 })->purpose('Annuler automatiquement les réservations non acceptées après 48h');
+
+// Expirer les réservations en attente depuis plus de 2 heures
+Schedule::command('reservations:expire')->everyFifteenMinutes();
+
+// Notifier les hôtes dont les prestations sont prévues demain (J-1)
+Schedule::command('notifications:imminent-prestations')->dailyAt('18:00');

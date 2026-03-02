@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Prestation;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -92,10 +93,13 @@ class PrestationController extends Controller
 
             $prestation->menus()->attach($request->menus);
 
+            // Notification prestation créée
+            Notification::notifyPrestationCreated($user->id, $prestation->id);
+
             $data = Prestation::with(['menus', 'typeDeRepas'])
                 ->where('id', $prestation->id)
                 ->get();
-                
+
             return response()->json([
                 'status' => true,
                 'message' => 'Prestation créée avec succès',
@@ -149,6 +153,9 @@ class PrestationController extends Controller
             $prestation->menus()->sync($request->menus);
         }
 
+        // Notification prestation mise à jour
+        Notification::notifyPrestationUpdated($user->id, $prestation->id);
+
         return response()->json([
             'status' => true,
             'message' => 'Prestation mise à jour avec succès',
@@ -177,7 +184,7 @@ class PrestationController extends Controller
         ]);
     }
 
-    public function destroy($id)
+    public function checkReservations($id)
     {
         $user = Auth::user();
         $prestation = Prestation::where('user_id', $user->id)->find($id);
@@ -187,6 +194,55 @@ class PrestationController extends Controller
                 'status' => false,
                 'message' => 'Prestation introuvable ou non autorisée'
             ], 404);
+        }
+
+        $reservations = $prestation->reservationsConfirmées;
+        $reservationCount = $reservations->count();
+
+        return response()->json([
+            'status' => true,
+            'has_reservations' => $reservationCount > 0,
+            'reservation_count' => $reservationCount,
+        ]);
+    }
+
+    public function destroy(Request $request, $id)
+    {
+        $user = Auth::user();
+        $prestation = Prestation::where('user_id', $user->id)->find($id);
+
+        if (!$prestation) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Prestation introuvable ou non autorisée'
+            ], 404);
+        }
+
+        // Vérifier s'il y a des réservations confirmées
+        $reservations = $prestation->reservationsConfirmées;
+
+        if ($reservations->count() > 0) {
+            $cancellationMessage = $request->input('cancellation_message', '');
+
+            foreach ($reservations as $reservation) {
+                // Annuler la réservation
+                $reservation->update([
+                    'status' => 'cancelled',
+                    'cancelled_by' => 'chef',
+                    'cancelled_at' => now(),
+                ]);
+
+                // Notifier le client
+                Notification::create([
+                    'user_id' => $reservation->client_id,
+                    'reservation_id' => $reservation->id,
+                    'type' => 'prestation_cancelled',
+                    'date_notification' => now()->toDateString(),
+                    'heure_notification' => now()->toTimeString(),
+                    'etat' => 0,
+                    'commentaire' => $cancellationMessage ?: 'La prestation a été annulée par l\'hôte.',
+                ]);
+            }
         }
 
         $prestation->menus()->detach();

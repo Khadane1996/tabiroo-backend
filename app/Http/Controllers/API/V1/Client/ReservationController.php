@@ -120,12 +120,18 @@ class ReservationController extends Controller
                 'private_message' => $request->private_message,
             ]);
 
-            Notification::notifyReservation($request->chef_id, $reservation->id);
+            if ($status === 'accepted') {
+                // Réservation auto-confirmée
+                Notification::notifyAutoConfirmed($request->chef_id, $reservation->id);
+                Notification::notifyReservationAcceptedForClient($reservation);
+            } else {
+                Notification::notifyReservation($request->chef_id, $reservation->id);
+            }
 
             // Notifier le client avec l'adresse du chef
             $chef = User::with('adresse')->find($request->chef_id);
             Notification::notifyChefAddressToClient($chef, $reservation);
-                
+
             return response()->json([
                 'status' => true,
                 'message' => 'Réservation créée avec succès',
@@ -274,8 +280,14 @@ class ReservationController extends Controller
             ]);
             $reservation->save();
 
-            // Notification au chef pour la nouvelle réservation
-            Notification::notifyReservation($request->chef_id, $reservation->id);
+            // Notifications
+            if ($status === 'accepted') {
+                // Réservation auto-confirmée
+                Notification::notifyAutoConfirmed($request->chef_id, $reservation->id);
+                Notification::notifyReservationAcceptedForClient($reservation);
+            } else {
+                Notification::notifyReservation($request->chef_id, $reservation->id);
+            }
 
             // Notification au client avec l'adresse du chef pour la prestation
             $chefUser = User::with('adresse')->find($request->chef_id);

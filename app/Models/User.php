@@ -33,6 +33,9 @@ class User extends Authenticatable
         'stripe_customer_id',
         'hygiene_qcm_badge_level',
         'hospitalite_qcm_badge_level',
+        'langues',
+        'type_accueil',
+        'expo_push_token',
         'is_admin',
     ];
 
@@ -57,6 +60,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_admin' => 'boolean',
+            'langues' => 'array',
         ];
     }
 

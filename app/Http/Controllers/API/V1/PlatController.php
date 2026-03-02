@@ -280,6 +280,60 @@ class PlatController extends Controller
     }
 
 
+    public function checkUsage($id)
+    {
+        try {
+            $plat = Plat::with(['menus.prestations.reservationsConfirmées'])->find($id);
+
+            if (!$plat) {
+                return response()->json(['message' => 'Plat non trouvé'], 404);
+            }
+
+            $menusWithPrestations = [];
+            $hasReservations = false;
+            $isPlanned = false;
+
+            foreach ($plat->menus as $menu) {
+                $prestations = $menu->prestations;
+                if ($prestations->count() > 0) {
+                    $isPlanned = true;
+                    $menusWithPrestations[] = [
+                        'id' => $menu->id,
+                        'nom' => $menu->nom,
+                    ];
+
+                    foreach ($prestations as $prestation) {
+                        if ($prestation->reservationsConfirmées->count() > 0) {
+                            $hasReservations = true;
+                            break 2;
+                        }
+                    }
+                }
+            }
+
+            if (!$isPlanned) {
+                $case = 'A';
+            } elseif (!$hasReservations) {
+                $case = 'B';
+            } else {
+                $case = 'C';
+            }
+
+            return response()->json([
+                'status' => true,
+                'case' => $case,
+                'menus' => $menusWithPrestations,
+                'has_reservations' => $hasReservations,
+                'is_planned' => $isPlanned,
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
     public function destroy($id)
     {
         try {

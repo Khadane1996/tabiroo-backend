@@ -1,5 +1,5 @@
 
-php artisan serve --host 192.168.1.22 --port 8000
+php artisan serve --host 192.168.1.8 --port 8000
 
 stripe listen --forward-to http://127.0.0.1:8000/stripe/webhook
 
@@ -216,3 +216,6 @@ MAIL_PASSWORD=8ea73f6b786afe
 MAIL_ENCRYPTION=tls
 MAIL_FROM_ADDRESS="inuyashakha96@gmail.com"
 MAIL_FROM_NAME="${APP_NAME}"
+
+
+php artisan debug:push --send --user=9

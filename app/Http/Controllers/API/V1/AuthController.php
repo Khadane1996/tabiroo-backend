@@ -345,7 +345,34 @@ class AuthController extends Controller
                 }
             }
 
-            if (!$registrationData || $registrationData['confirmation_code'] != $request->confirmation_code) {
+            // Si pas de données en cache, vérifier en base (cas reset password)
+            if (!$registrationData) {
+                $user = User::when($request->email, function ($query) use ($request) {
+                        $query->where('email', $request->email);
+                    })
+                    ->when($request->phone, function ($query) use ($request) {
+                        $query->where('phone', $request->phone);
+                    })
+                    ->first();
+
+                if ($user && $user->confirmation_code == $request->confirmation_code) {
+                    // Code valide, réinitialiser le confirmation_code
+                    $user->confirmation_code = null;
+                    $user->save();
+
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Code vérifié avec succès.',
+                    ], 200);
+                }
+
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Code de confirmation incorrect ou expiré.',
+                ], 400);
+            }
+
+            if ($registrationData['confirmation_code'] != $request->confirmation_code) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Code de confirmation incorrect ou expiré.',
@@ -405,7 +432,7 @@ class AuthController extends Controller
                     $cacheKeys = array_filter($cacheKeys, function($key) use ($cacheKey) {
                         return $key !== $cacheKey;
                     });
-                    
+
                     if (empty($cacheKeys)) {
                         Cache::forget('registration_keys_' . $identifier);
                     } else {
@@ -837,6 +864,17 @@ class AuthController extends Controller
                 'biographie' => $request->biographie,
             ];
 
+            // Langues parlées (JSON)
+            if ($request->has('langues')) {
+                $langues = $request->input('langues');
+                $updateData['langues'] = is_string($langues) ? json_decode($langues, true) : $langues;
+            }
+
+            // Type d'accueil
+            if ($request->has('type_accueil')) {
+                $updateData['type_accueil'] = $request->input('type_accueil');
+            }
+
             // Mettre à jour photo_url uniquement si une nouvelle photo a été uploadée
             if ($fileName !== null) {
                 $updateData['photo_url'] = $fileName;
@@ -856,6 +894,26 @@ class AuthController extends Controller
                 'message' => 'Une erreur est survenue : ' . $th->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Stocker le token push Expo pour l'utilisateur connecté
+     */
+    public function storePushToken(Request $request)
+    {
+        $request->validate([
+            'expo_push_token' => 'required|string',
+        ]);
+
+        $user = $request->user();
+        $user->update([
+            'expo_push_token' => $request->expo_push_token,
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Token push enregistré avec succès',
+        ]);
     }
 
 }

@@ -154,6 +154,52 @@ class MenuController extends Controller
         }
     }
 
+    public function checkUsage($id)
+    {
+        try {
+            $menu = Menu::with(['prestations.reservationsConfirmées'])->find($id);
+
+            if (!$menu) {
+                return response()->json(['message' => 'Menu non trouvé'], 404);
+            }
+
+            $prestationsData = [];
+            $hasReservations = false;
+            $isPlanned = $menu->prestations->count() > 0;
+
+            foreach ($menu->prestations as $prestation) {
+                $prestationsData[] = [
+                    'id' => $prestation->id,
+                    'date_prestation' => $prestation->date_prestation,
+                ];
+
+                if ($prestation->reservationsConfirmées->count() > 0) {
+                    $hasReservations = true;
+                }
+            }
+
+            if (!$isPlanned) {
+                $case = 'A';
+            } elseif (!$hasReservations) {
+                $case = 'B';
+            } else {
+                $case = 'C';
+            }
+
+            return response()->json([
+                'status' => true,
+                'case' => $case,
+                'prestations' => $prestationsData,
+                'has_reservations' => $hasReservations,
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
     // Supprimer un menu
     public function destroy($id)
     {
