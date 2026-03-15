@@ -1,5 +1,5 @@
 
-php artisan serve --host 192.168.1.8 --port 8000
+php artisan serve --host 192.168.1.2 --port 8000
 
 stripe listen --forward-to http://127.0.0.1:8000/stripe/webhook
 
@@ -219,3 +219,86 @@ MAIL_FROM_NAME="${APP_NAME}"
 
 
 php artisan debug:push --send --user=9
+
+
+
+ 5. Migration de données existantes — Commande php artisan reservations:migrate-statuses avec option --dry-run. Mappe
+   les anciens statuts (pending, accepted, cancelled, completed, upcoming, expired) vers les nouveaux statuts CDC.
+  Affiche un tableau récapitulatif.
+
+
+
+❯ Du coup si je déploie dans le serveur j'aurai pas d'autre config à faire ou de commande à lancer pour démarrer le   
+cron, pour les annulations automatiques de réservation ?                                                              
+                                                                                                                      
+⏺ Bonne question. Oui, il y a des choses à faire côté serveur pour que tout fonctionne. Voici la checklist :          
+                                                                                                                      
+  1. Migrations de base de données                                                                                    
+                                                                                                                      
+  php artisan migrate                                                                                                 
+   
+  Cela va créer les nouvelles tables (incidents, stripe_webhook_events) et ajouter les colonnes CDC aux tables        
+  reservations et users.                                    
+
+  2. Migration des anciens statuts
+
+  # D'abord en dry-run pour vérifier
+  php artisan reservations:migrate-statuses --dry-run
+
+  # Puis pour de vrai
+  php artisan reservations:migrate-statuses
+
+  3. Le Cron — point critique
+
+  Laravel ne lance pas les scheduled commands tout seul. Il faut ajouter une seule entrée cron sur le serveur qui
+  appelle le scheduler Laravel chaque minute. C'est lui qui dispatche ensuite les 5 commandes selon leur fréquence.
+
+  crontab -e
+
+  Ajouter cette ligne :
+
+  * * * * * cd /chemin/vers/tabiroo-backend && php artisan schedule:run >> /dev/null 2>&1
+
+  Remplace /chemin/vers/tabiroo-backend par le chemin réel sur ton serveur (ex: /var/www/tabiroo-backend).
+
+  Sans ça, aucune des commandes schedulées ne s'exécutera :
+
+  ┌────────────────────────────────────┬───────────┬──────────────────────────────────────────────────────────┐
+  │              Commande              │ Fréquence │                           Rôle                           │
+  ├────────────────────────────────────┼───────────┼──────────────────────────────────────────────────────────┤
+  │ reservations:expire-manual         │ 5 min     │ Expire les réservations manuelles sans réponse hôte (4h) │
+  ├────────────────────────────────────┼───────────┼──────────────────────────────────────────────────────────┤
+  │ reservations:mark-completed        │ 15 min    │ Marque les prestations terminées → COMPLETED_PENDING_OTP │
+  ├────────────────────────────────────┼───────────┼──────────────────────────────────────────────────────────┤
+  │ reservations:auto-validate-otp     │ 15 min    │ Auto-valide si OTP non saisi sous 24h                    │
+  ├────────────────────────────────────┼───────────┼──────────────────────────────────────────────────────────┤
+  │ reservations:process-payouts       │ 30 min    │ Reverse les paiements aux hôtes via Stripe               │
+  ├────────────────────────────────────┼───────────┼──────────────────────────────────────────────────────────┤
+  │ notifications:imminent-prestations │ 18h00     │ Notifie les hôtes J-1                                    │
+  └────────────────────────────────────┴───────────┴──────────────────────────────────────────────────────────┘
+
+  4. Variables d'environnement Stripe (.env)
+
+  Vérifie que ton .env de production contient les clés live (pas test) :
+
+  STRIPE_SECRET_KEY=sk_live_...
+  STRIPE_WEBHOOK_SECRET=whsec_...
+
+  5. Webhook Stripe
+
+  Dans le dashboard Stripe, configure le webhook endpoint pointant vers :
+
+  https://ton-domaine.com/api/stripe/webhook
+
+  Avec les événements suivants activés :
+  - payment_intent.succeeded
+  - charge.refunded
+  - refund.updated
+  - account.updated
+  - charge.dispute.created
+
+  Résumé
+
+  Le seul point qu'on oublie souvent c'est le cron schedule:run. Sans lui, pas d'expiration automatique, pas
+  d'auto-validation OTP, pas de payouts. Le reste (migrations + .env + webhook Stripe) est standard mais
+  indispensable.

@@ -31,6 +31,10 @@ class User extends Authenticatable
         'password',
         'stripe_account_id',
         'stripe_customer_id',
+        'stripe_details_submitted',
+        'stripe_charges_enabled',
+        'stripe_payouts_enabled',
+        'stripe_requirements_currently_due_count',
         'hygiene_qcm_badge_level',
         'hospitalite_qcm_badge_level',
         'langues',
@@ -61,6 +65,10 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_admin' => 'boolean',
             'langues' => 'array',
+            'stripe_details_submitted' => 'boolean',
+            'stripe_charges_enabled' => 'boolean',
+            'stripe_payouts_enabled' => 'boolean',
+            'stripe_requirements_currently_due_count' => 'integer',
         ];
     }
 

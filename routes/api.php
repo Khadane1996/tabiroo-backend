@@ -21,16 +21,11 @@ Route::get('/user', function (Request $request) {
 
 
 Route::post("/register", [AuthController::class, "register"]);
-
 Route::post("/login", [AuthController::class, "login"]);
-
 Route::post("/opt", [AuthController::class, "verify"]);
-
 Route::post("/resend-otp", [AuthController::class, "resendOtp"]);
 Route::post("/check-registration-status", [AuthController::class, "checkRegistrationStatus"]);
-
 Route::post("/sms", [AuthController::class, "sendSms2"]);
-
 Route::post("/send-otp-reset-password", [AuthController::class, "sendOtpforResetPassword"]);
 Route::post("/reset-password", [AuthController::class, "resetPassword"]);
 Route::post("/auth/google", [AuthController::class, "googleAuth"]);
@@ -62,12 +57,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('menus')->group(function () {
-        Route::get('/', [MenuController::class, 'index']); // Récupérer tous les menus
-        Route::get('{id}/check-usage', [MenuController::class, 'checkUsage']); // Vérifier l'usage
-        Route::get('{id}', [MenuController::class, 'show']); // Afficher un menu spécifique
-        Route::post('/', [MenuController::class, 'store']); // Créer un menu
-        Route::post('/update/{id}', [MenuController::class, 'update']); // Mettre à jour un menu
-        Route::delete('{id}', [MenuController::class, 'destroy']); // Supprimer un menu
+        Route::get('/', [MenuController::class, 'index']);
+        Route::get('{id}/check-usage', [MenuController::class, 'checkUsage']);
+        Route::get('{id}', [MenuController::class, 'show']);
+        Route::post('/', [MenuController::class, 'store']);
+        Route::post('/update/{id}', [MenuController::class, 'update']);
+        Route::delete('{id}', [MenuController::class, 'destroy']);
     });
 });
 
@@ -90,37 +85,44 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 Route::get('/test', function (Request $request) {
-    return response()->json(['message' => 'Test réussi'], 200);
+    return response()->json(['message' => 'Test reussi'], 200);
 });
-
-// Route::prefix('client')->group(function () {
-//     Route::get("/all-prestations", [AllPrestationController::class, "index"]);
-// });
 
 Route::prefix('client')->group(function () {
     Route::get("/all-prestations", [AllPrestationController::class, "index"]);
     Route::get("/mieux-notes-prestations", [AllPrestationController::class, "mieuxNote"]);
     Route::get("/plats/{id}", [AllPrestationController::class, "getPlats"]);
     Route::post("/reservation", [ReservationController::class, "store"]);
-    Route::post("/reservation/reserve-and-pay", [ReservationController::class, "reserveAndPay"]) // init reservation + paymentintent
+
+    // CDC: Calcul du prix (preview avant paiement)
+    Route::get("/reservation/calculate-price", [ReservationController::class, "calculatePrice"]);
+
+    Route::post("/reservation/reserve-and-pay", [ReservationController::class, "reserveAndPay"])
         ->middleware('auth:sanctum');
-    Route::post("/reservation/cancel-on-payment-fail", [ReservationController::class, "cancelOnPaymentFail"]) // cleanup on payment fail
+    Route::post("/reservation/cancel-on-payment-fail", [ReservationController::class, "cancelOnPaymentFail"])
         ->middleware('auth:sanctum');
-    Route::get("/reservation/{id}/payment-details", [ReservationController::class, "getPaymentDetails"]) // récupérer les détails de paiement
-    ->middleware('auth:sanctum');
+    Route::get("/reservation/{id}/payment-details", [ReservationController::class, "getPaymentDetails"])
+        ->middleware('auth:sanctum');
     Route::post("/reservation/update/{id}", [ReservationController::class, "update"]);
     Route::get("/reservation/{user_id}", [ReservationController::class, "index"]);
+
+    // CDC: Annulation par le convive (endpoint dedie)
+    Route::post("/reservation/{id}/cancel", [ReservationController::class, "cancelByGuest"])
+        ->middleware('auth:sanctum');
 
     Route::get("/avis-client/{menu_id}", [AvisClientController::class, "index"]);
     Route::post("/avis-client", [AvisClientController::class, "store"]);
 
     Route::get("/reservation-chef/{user_id}", [ReservationController::class, "getReservationForChef"]);
-
     Route::get("/notifications/{user_id}", [ReservationController::class, "getNotication"]);
 
-    // Validation d'une réservation par le chef via code communiqué par le client
     Route::post("/reservation/{id}/validate-code", [ReservationController::class, "validateWithCode"])
         ->middleware('auth:sanctum');
+});
+
+// CDC: Annulation par l'hote (endpoint dedie)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post("/chef/reservation/{id}/cancel", [ReservationController::class, "cancelByHost"]);
 });
 
 Route::get("/tableau-bord/{user_id}", [TableauBordController::class, "index"]);
@@ -132,28 +134,22 @@ Route::get("/ca-details/{user_id}", [TableauBordController::class, "getCaDetails
 Route::get("/debug-best-seller/{user_id}", [TableauBordController::class, "debugBestSeller"]);
 
 Route::prefix('stripe')->group(function () {
-    // 🔹 Paiement d’un chef
     Route::post('/payment-intent', [StripeController::class, 'createPaymentIntent']);
 
-    // 🔹 SetupIntent pour enregistrer une carte
     Route::post('/setup-intent', [StripeController::class, 'createSetupIntent'])
         ->middleware('auth:sanctum');
 
-    // 🔹 Création du compte Stripe Connect + lien avec le user connecté
     Route::post('/account', [StripeController::class, 'createAccount'])
-        ->middleware('auth:sanctum'); // ⚡ protège cette route (chef connecté)
+        ->middleware('auth:sanctum');
 
-    // 🔹 Génération d’un lien d’onboarding
     Route::post('/account/link', [StripeController::class, 'createAccountLink'])
-        ->middleware('auth:sanctum'); // ⚡ facultatif mais conseillé
+        ->middleware('auth:sanctum');
 
     Route::get('/status', [StripeController::class, 'checkAccountStatus'])
-    ->middleware('auth:sanctum');
-    
-    // Vérifier le statut d'un PaymentIntent
+        ->middleware('auth:sanctum');
+
     Route::get('/payment-intent/{id}/status', [StripeController::class, 'checkPaymentStatus'])
-    ->middleware('auth:sanctum');
-    
+        ->middleware('auth:sanctum');
 });
 
 Route::post('/stripe/webhook', [StripeController::class, 'handleWebhook']);

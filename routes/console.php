@@ -3,52 +3,24 @@
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
-use App\Models\Reservation;
-use App\Services\StripeService;
-use Illuminate\Support\Facades\Log;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote')->hourly();
 
-// Annuler automatiquement les réservations non acceptées après 48h
-Artisan::command('reservations:auto-cancel', function () {
-    $this->info('Recherche des réservations à annuler automatiquement...');
+// === CDC Stripe: Commandes schedulees ===
 
-    $threshold = now()->subHours(48);
+// Expirer les reservations manuelles sans reponse hote apres 4h (Flux 2)
+Schedule::command('reservations:expire-manual')->everyFiveMinutes();
 
-    $reservations = Reservation::where('status', 'pending')
-        ->whereNotNull('payment_intent_id')
-        ->whereNull('refunded_at')
-        ->where('created_at', '<=', $threshold)
-        ->get();
+// Marquer les prestations terminees -> COMPLETED_PENDING_OTP
+Schedule::command('reservations:mark-completed')->everyFifteenMinutes();
 
-    /** @var StripeService $stripe */
-    $stripe = app(StripeService::class);
+// Auto-valider les reservations dont l'OTP n'a pas ete saisi sous 24h
+Schedule::command('reservations:auto-validate-otp')->everyFifteenMinutes();
 
-    foreach ($reservations as $reservation) {
-        try {
-            $this->info('Annulation de la réservation #'.$reservation->id);
+// Traiter les reversements aux hotes (payouts)
+Schedule::command('reservations:process-payouts')->everyThirtyMinutes();
 
-            $stripe->refundPaymentIntent($reservation->payment_intent_id);
-            $reservation->status = 'cancelled';
-            $reservation->motif = $reservation->motif ?: 'Annulation automatique (48h sans acceptation)';
-            $reservation->refunded_at = now();
-            $reservation->auto_cancelled_at = now();
-            $reservation->save();
-        } catch (\Throwable $e) {
-            Log::error('Erreur lors de l\'annulation automatique de la réservation', [
-                'reservation_id' => $reservation->id,
-                'error' => $e->getMessage(),
-            ]);
-        }
-    }
-
-    $this->info('Traitement des réservations en attente terminé.');
-})->purpose('Annuler automatiquement les réservations non acceptées après 48h');
-
-// Expirer les réservations en attente depuis plus de 2 heures
-Schedule::command('reservations:expire')->everyFifteenMinutes();
-
-// Notifier les hôtes dont les prestations sont prévues demain (J-1)
+// Notifier les hotes dont les prestations sont prevues demain (J-1)
 Schedule::command('notifications:imminent-prestations')->dailyAt('18:00');

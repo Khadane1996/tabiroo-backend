@@ -84,6 +84,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('logout', [AdminAuthController::class, 'logout'])->name('logout');
 
         Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard/export-csv', [AdminDashboardController::class, 'exportCsv'])->name('dashboard.export-csv');
 
         Route::resource('posts', AdminPostController::class)->except(['show']);
     });

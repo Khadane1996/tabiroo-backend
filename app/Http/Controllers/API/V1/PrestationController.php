@@ -63,7 +63,7 @@ class PrestationController extends Controller
                 'date_prestation' => 'required|string',
                 'menus' => 'required|array',
                 'menus.*' => 'exists:menus,id',
-                'choix' => 'required|string'    
+                'choix' => 'required|string'
             ]);
 
             if ($validate->fails()) {
@@ -75,6 +75,17 @@ class PrestationController extends Controller
             }
 
             $user = Auth::user();
+
+            // CDC: Bloquer la publication si le compte Stripe n'est pas actif
+            if (!$user->stripe_account_id || !$user->stripe_payouts_enabled) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Vous devez activer votre compte de paiement avant de publier une prestation.',
+                    'stripe_required' => true,
+                    'stripe_payouts_enabled' => (bool) $user->stripe_payouts_enabled,
+                    'stripe_account_id' => $user->stripe_account_id,
+                ], 403);
+            }
 
             $prestation = Prestation::create([
                 'user_id' => $user->id,
