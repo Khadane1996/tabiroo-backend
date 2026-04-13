@@ -42,5 +42,8 @@ class Menu extends Model
         return $this->hasMany(AvisClient::class, 'menu_id');
     }
 
-    
+    public function favoris()
+    {
+        return $this->hasMany(\App\Models\Favori::class);
+    }
 }

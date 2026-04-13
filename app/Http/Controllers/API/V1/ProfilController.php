@@ -46,7 +46,8 @@ class ProfilController extends Controller
                 'codePostal' => $request->codePostal,
                 'ville' => $request->ville,
                 'latitude' => $request->latitude,
-                'longitude' => $request->longitude
+                'longitude' => $request->longitude,
+                'infoAcces' => $request->infoAcces,
             ]);
 
             return response()->json([
@@ -109,36 +110,20 @@ class ProfilController extends Controller
     public function desactiveCompte(Request $request)
     {
         try {
-            $validateUser = Validator::make($request->all(), [
-                'id' => 'required|exists:bancaires,id',
-                'etat' => 'required'
-            ]);
-
-            if ($validateUser->fails()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Erreur de validation',
-                    'errors' => $validateUser->errors(),
-                ], 422);
-            }
-
-            $user = User::find($request->id);
+            $user = $request->user();
 
             if (!$user) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Utilisateur non trouvé',
-                ], 404);
-            }    
+                    'message' => 'Utilisateur non authentifié',
+                ], 401);
+            }
 
-            $user->update([
-                'etat' => $request->etat
-            ]);
+            $user->update(['etat' => 0]);
 
             return response()->json([
                 'status' => true,
-                'message' => 'Utilisateur désactivé avec succès',
-                'user' => $user
+                'message' => 'Compte désactivé avec succès',
             ], 200);
 
         } catch (\Throwable $th) {

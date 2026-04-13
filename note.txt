@@ -302,3 +302,51 @@ cron, pour les annulations automatiques de réservation ?
   Le seul point qu'on oublie souvent c'est le cron schedule:run. Sans lui, pas d'expiration automatique, pas
   d'auto-validation OTP, pas de payouts. Le reste (migrations + .env + webhook Stripe) est standard mais
   indispensable.
+
+
+*** App Tabiroo - Wording app hôte 260129 V1 (tabiroo-chef)
+-Pourquoi il ne se passe rien quand je clique sur 'Annuler cette prestation', l'Alerte de confirmation d'annulation doit respecter la charte graphique en ressemblant au modal de confirmation qui est utilisé dans la page des plats.
+-Règles de gestion plats et menus slides 6 et 9 à intégrer. (Dans le document power point que j'ai upload)
+
+
+*** App Tabiroo - Wording app convives 260209 V1 (tabiroo-client)
+-Onboarding - wording à corriger (Dans le document power point que j'ai upload)
+-Adresse de départ - lorsqu'on ajoute une première adresse, lors de la sélection, l'onglet se ferme brutalement. On devrait rester sur la pop up "choisir une adresse" pour que l'utilisateur vérifie l'adresse renseignée dans le détail.
+-Les favoris ne sont pas dynamisés, crée une page favoris en respectant la charte graphique et dynamiser tout le processus coté backend et frontend en ayant une bonne logique (voir page 5 sur, dans le document power point que j'ai upload).
+-Il manque le filtre à proximité sur l'écran d'accueil - PPT(voir page 6, dans le document power point que j'ai upload)
+-Date "quand?" sur l'écran principal tu peux laisser le jour et le mois (ex : 14 mars) mais il faut faire la même chose sur la page de résultat des filtres (voir page 7, dans le document power point que j'ai upload) + Il faut également appliquer les règles de gestion des filtres (page 7, dans le document power point que j'ai upload).
+-Carte menus - il manque un icone sur les carte pour indiquer que les réservation sont acceptées automatiquement ou non (un éclair jaune = auto / un éclaire jaune barré = manuel)
+-Profil - Il y a marqué "undefined" à côté du nom du convive: remplacer par vide '' quand c'est undefined.
+-Profil Moyens de paiement - revoir la gestion des carte (slide 17, dans le document power point que j'ai upload). La gestion des cartes doit être reliée au bouton "changer" dans le formulaire de réservation.
+-Profil centre d'aide - Le lien vers le formulaire de contact doit ressembler à un bouton (mettre le bouton orange et le wording en blanc).
+-Profil Sécurité - Dynamiser la modification de mot de passe coté front et backend et aussi dynamiser la désactivation et suppression de mon compte (s'il existe pas des pages en créer en respectant la charte graphique)
+
+ ┌─────┬─────────────────────────────────────────────────────────────────────────────┬────────┐                                 
+  │  #  │                                    Tâche                                    │ Statut │
+  ├─────┼─────────────────────────────────────────────────────────────────────────────┼────────┤                                 
+  │ 1   │ [CHEF] Fix bouton "Annuler cette prestation" + CustomAlert charte graphique  │ ✅     │                                
+  ├─────┼──────────────────────────────────────────────────────────────────────────────┼────────┤
+  │ 2   │ [CHEF] Règles gestion modification/suppression des plats (cas A/B/C)         │ ✅     │           Actuel test                      
+  ├─────┼──────────────────────────────────────────────────────────────────────────────┼────────┤                                
+  │ 3   │ [CHEF] Règles gestion modification/suppression des menus (cas A/B/C)         │ ✅     │                                
+  ├─────┼──────────────────────────────────────────────────────────────────────────────┼────────┤                                
+  │ 4   │ [CLIENT] Fix wording onboarding (slide 2)                                    │ ✅     │                                
+  ├─────┼──────────────────────────────────────────────────────────────────────────────┼────────┤                                
+  │ 5   │ [CLIENT] Fix fermeture brutale modal adresse                                 │ ✅     │                                
+  ├─────┼──────────────────────────────────────────────────────────────────────────────┼────────┤
+  │ 6   │ [CLIENT + BACKEND] Favoris — backend complet + frontend (cœur, page, profil) │ ✅     │                                
+  ├─────┼──────────────────────────────────────────────────────────────────────────────┼────────┤
+  │ 7   │ [CLIENT] Filtre "À proximité" réactivé avec GPS                              │ ✅     │                                
+  ├─────┼──────────────────────────────────────────────────────────────────────────────┼────────┤
+  │ 8   │ [CLIENT] Fix format date "Quand?" + règles filtres all-services                 │ ✅     │                             
+  ├─────┼─────────────────────────────────────────────────────────────────────────────────┼────────┤                             
+  │ 9   │ [CLIENT] Icône auto/manuel sur les cartes menus (⚡ / 🚫⚡)                     │ ✅     │                             
+  ├─────┼─────────────────────────────────────────────────────────────────────────────────┼────────┤                             
+  │ 10  │ [CLIENT] Fix "undefined" à côté du nom dans le profil                           │ ✅     │                             
+  ├─────┼─────────────────────────────────────────────────────────────────────────────────┼────────┤
+  │ 11  │ [CLIENT] Gestion cartes bancaires revampée + lien bouton "Changer"              │ ✅     │                             
+  ├─────┼─────────────────────────────────────────────────────────────────────────────────┼────────┤
+  │ 12  │ [CLIENT] Centre d'aide — bouton orange formulaire contact                       │ ✅     │                             
+  ├─────┼─────────────────────────────────────────────────────────────────────────────────┼────────┤
+  │ 13  │ [CLIENT + BACKEND] Modification mot de passe + désactivation/suppression compte │ ✅     │                             
+  └─────┴─────────────────────────────────────────────────────────────────────────────────┴────────┘

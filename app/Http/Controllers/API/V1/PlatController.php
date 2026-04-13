@@ -337,7 +337,7 @@ class PlatController extends Controller
     public function destroy($id)
     {
         try {
-            $plat = Plat::find($id);
+            $plat = Plat::with('menus')->find($id);
 
             if (!$plat) {
                 return response()->json(['message' => 'Plat non trouvé'], 404);
@@ -352,6 +352,9 @@ class PlatController extends Controller
                     }
                 }
             }
+
+            // Détacher explicitement le plat de tous les menus avant suppression
+            $plat->menus()->detach();
 
             $plat->delete();
 

@@ -310,6 +310,82 @@ class ReservationController extends Controller
     }
 
     /**
+     * Confirmer la reservation apres paiement cote client (fallback webhook)
+     * Verifie le statut du PaymentIntent directement via l'API Stripe.
+     * - PI succeeded  (Flux 1 auto)   → CONFIRMED
+     * - PI requires_capture (Flux 2)  → PENDING_HOST_RESPONSE (inchange)
+     */
+    public function confirmAfterPayment(Request $request, $id)
+    {
+        try {
+            $reservation = Reservation::findOrFail($id);
+
+            // Deja confirmee, rien a faire
+            if ($reservation->status === ReservationStatus::CONFIRMED) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Reservation deja confirmee',
+                    'reservation_status' => $reservation->status,
+                ]);
+            }
+
+            if (!$reservation->payment_intent_id) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Aucun PaymentIntent associe a cette reservation',
+                ], 422);
+            }
+
+            $pi = $this->stripe->retrievePaymentIntent($reservation->payment_intent_id);
+
+            if (!$pi) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'PaymentIntent introuvable chez Stripe',
+                ], 404);
+            }
+
+            if ($pi->status === 'succeeded') {
+                // Flux 1 : capture automatique → confirmer immediatement
+                $reservation->status = ReservationStatus::CONFIRMED;
+                $reservation->stripe_charge_id = $pi->latest_charge ?? null;
+                $reservation->save();
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Reservation confirmee',
+                    'reservation_status' => $reservation->status,
+                ]);
+            }
+
+            if ($pi->status === 'requires_capture') {
+                // Flux 2 : en attente de validation hote, statut deja correct
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Paiement autorise, en attente de validation du chef',
+                    'reservation_status' => $reservation->status,
+                ]);
+            }
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Statut du paiement inattendu : ' . $pi->status,
+                'pi_status' => $pi->status,
+            ], 422);
+
+        } catch (\Throwable $e) {
+            Log::error('Erreur confirmAfterPayment', [
+                'reservation_id' => $id,
+                'error' => $e->getMessage(),
+            ]);
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Annuler la reservation si le paiement a echoue cote client
      */
     public function cancelOnPaymentFail(Request $request)
@@ -570,7 +646,7 @@ class ReservationController extends Controller
 
     public function getReservationForChef($user_id)
     {
-        $reservations = Reservation::with('menuPrestation.prestation.typeDeRepas', 'client')
+        $reservations = Reservation::with('menuPrestation.prestation.typeDeRepas', 'menuPrestation.menu', 'client')
             ->where('chef_id', $user_id)
             ->orderBy('id', 'desc')
             ->get();

@@ -29,6 +29,7 @@ class AllPrestationController extends Controller
             'prestations.reservationsConfirmées'
         ])
         ->whereHas('prestations')
+        ->whereHas('plats')
         // Filtrer uniquement les menus des chefs avec compte Stripe configuré
         ->whereHas('user', function ($q) {
             $q->whereNotNull('stripe_account_id');
@@ -109,6 +110,7 @@ class AllPrestationController extends Controller
             'prestations.reservationsConfirmées'
         ])
         ->whereHas('prestations')
+        ->whereHas('plats')
         // Filtrer uniquement les menus des chefs avec compte Stripe configuré
         ->whereHas('user', function ($q) {
             $q->whereNotNull('stripe_account_id');

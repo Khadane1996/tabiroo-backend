@@ -17,7 +17,8 @@ class Adresse extends Model
         'codePostal',
         'ville',
         'latitude',
-        'longitude'
+        'longitude',
+        'infoAcces',
     ];
 
     public function user()

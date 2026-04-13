@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\V1\Client\AllPrestationController;
 use App\Http\Controllers\API\V1\Client\ReservationController;
 use App\Http\Controllers\API\V1\Client\AvisClientController;
+use App\Http\Controllers\API\V1\Client\FavoriController;
 use App\Http\Controllers\API\V1\TableauBordController;
 use App\Http\Controllers\StripeController;
 
@@ -40,9 +41,11 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 Route::post("/update-bancaire", [ProfilController::class, "updateBancaire"]);
-Route::post("/desactive-compte", [ProfilController::class, "desactiveCompte"]);
-Route::delete("/destroy-compte/{id}", [ProfilController::class, "destroy"]);
-Route::put("/update-password-profil/{id}", [ProfilController::class, "updatePassword"]);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post("/desactive-compte", [ProfilController::class, "desactiveCompte"]);
+    Route::delete("/destroy-compte/{id}", [ProfilController::class, "destroy"]);
+    Route::put("/update-password-profil/{id}", [ProfilController::class, "updatePassword"]);
+});
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('plats')->group(function () {
@@ -101,6 +104,8 @@ Route::prefix('client')->group(function () {
         ->middleware('auth:sanctum');
     Route::post("/reservation/cancel-on-payment-fail", [ReservationController::class, "cancelOnPaymentFail"])
         ->middleware('auth:sanctum');
+    Route::post("/reservation/{id}/confirm-payment", [ReservationController::class, "confirmAfterPayment"])
+        ->middleware('auth:sanctum');
     Route::get("/reservation/{id}/payment-details", [ReservationController::class, "getPaymentDetails"])
         ->middleware('auth:sanctum');
     Route::post("/reservation/update/{id}", [ReservationController::class, "update"]);
@@ -118,6 +123,11 @@ Route::prefix('client')->group(function () {
 
     Route::post("/reservation/{id}/validate-code", [ReservationController::class, "validateWithCode"])
         ->middleware('auth:sanctum');
+
+    // Favoris
+    Route::get("/favoris", [FavoriController::class, "index"])->middleware('auth:sanctum');
+    Route::get("/favoris/ids", [FavoriController::class, "ids"])->middleware('auth:sanctum');
+    Route::post("/favoris/{menu_id}/toggle", [FavoriController::class, "toggle"])->middleware('auth:sanctum');
 });
 
 // CDC: Annulation par l'hote (endpoint dedie)
