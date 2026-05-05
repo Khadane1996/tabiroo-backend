@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ReservationStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -59,7 +60,11 @@ class Prestation extends Model
             'menu_prestation_id', // clé étrangère sur reservations
             'id', // clé locale sur prestations
             'id'  // clé locale sur menu_prestation
-        )->whereIn('status', ['pending', 'accepted']);
+        )->whereIn('status', [
+            ReservationStatus::PENDING_HOST_RESPONSE->value,
+            ReservationStatus::PAYMENT_CAPTURED_HELD->value,
+            ReservationStatus::CONFIRMED->value,
+        ]);
     }
 
     protected $appends = ['places_restantes', 'est_privatisee'];
@@ -84,7 +89,7 @@ class Prestation extends Model
 
     public function reservationsConfirméesTwo()
     {
-        return $this->reservations()->where('status', 'confirmed');
+        return $this->reservations()->where('status', ReservationStatus::CONFIRMED->value);
     }
 
     /**
@@ -94,7 +99,7 @@ class Prestation extends Model
     {
         return $this->reservations()
             ->where('is_private', true)
-            ->whereIn('status', ['accepted'])
+            ->whereIn('status', [ReservationStatus::CONFIRMED->value])
             ->exists();
     }
 

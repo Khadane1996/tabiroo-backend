@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API\V1;
 
+use App\Enums\ReservationStatus;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Reservation;
@@ -16,7 +17,7 @@ class TableauBordController extends Controller
      public function index($user_id)
     {
         $countPending = Reservation::where('chef_id', $user_id)
-        ->where('status', 'pending')
+        ->where('status', ReservationStatus::PENDING_HOST_RESPONSE->value)
         ->count();
 
         $now = Carbon::now();
@@ -24,8 +25,10 @@ class TableauBordController extends Controller
         $startOfMonth = Carbon::now()->startOfMonth()->toDateString();
         $endOfMonth = Carbon::now()->endOfMonth()->toDateString();
 
+        $completedStatuses = array_column(ReservationStatus::completedStatuses(), 'value');
+
         $totalRevenue = Reservation::where('chef_id', $user_id)
-            ->where('status', 'completed')
+            ->whereIn('status', $completedStatuses)
             ->whereRaw("TO_DATE(SUBSTRING(date_prestation, 1, 10), 'YYYY-MM-DD') BETWEEN ? AND ?", [
                 $startOfMonth,
                 $endOfMonth
@@ -45,7 +48,7 @@ class TableauBordController extends Controller
             ->join('menu_prestation', 'reservations.menu_prestation_id', '=', 'menu_prestation.id')
             ->join('menus', 'menu_prestation.menu_id', '=', 'menus.id')
             ->where('menus.user_id', $user_id)
-            ->where('reservations.status', '!=', 'cancelled')
+            ->whereNotIn('reservations.status', array_column(ReservationStatus::cancelledStatuses(), 'value'))
             ->select('menus.nom', 'menus.id', DB::raw('COUNT(*) as reservation_count'))
             ->groupBy('menus.id', 'menus.nom')
             ->orderByDesc('reservation_count')
@@ -81,7 +84,7 @@ class TableauBordController extends Controller
             ->join('menu_prestation', 'reservations.menu_prestation_id', '=', 'menu_prestation.id')
             ->join('menus', 'menu_prestation.menu_id', '=', 'menus.id')
             ->where('menus.user_id', $user_id)
-            ->where('reservations.status', '!=', 'cancelled')
+            ->whereNotIn('reservations.status', array_column(ReservationStatus::cancelledStatuses(), 'value'))
             ->select('menus.nom', 'menus.id', DB::raw('COUNT(*) as reservation_count'))
             ->groupBy('menus.id', 'menus.nom')
             ->orderByDesc('reservation_count')
@@ -194,7 +197,7 @@ class TableauBordController extends Controller
             ->join('menu_prestation', 'reservations.menu_prestation_id', '=', 'menu_prestation.id')
             ->join('menus', 'menu_prestation.menu_id', '=', 'menus.id')
             ->where('menus.user_id', $user_id)
-            ->where('reservations.status', '!=', 'cancelled')
+            ->whereNotIn('reservations.status', array_column(ReservationStatus::cancelledStatuses(), 'value'))
             ->select('menus.nom', 'menus.id', DB::raw('COUNT(*) as reservation_count'))
             ->groupBy('menus.id', 'menus.nom')
             ->orderByDesc('reservation_count')
@@ -212,7 +215,7 @@ class TableauBordController extends Controller
             ->join('menu_prestation', 'reservations.menu_prestation_id', '=', 'menu_prestation.id')
             ->join('menus', 'menu_prestation.menu_id', '=', 'menus.id')
             ->where('menus.user_id', $user_id)
-            ->where('reservations.status', '!=', 'cancelled')
+            ->whereNotIn('reservations.status', array_column(ReservationStatus::cancelledStatuses(), 'value'))
             ->count();
 
         // Lister tous les menus du chef
@@ -256,7 +259,7 @@ class TableauBordController extends Controller
             ->join('menu_prestation', 'reservations.menu_prestation_id', '=', 'menu_prestation.id')
             ->join('menus', 'menu_prestation.menu_id', '=', 'menus.id')
             ->where('menus.user_id', $user_id)
-            ->where('reservations.status', 'completed')
+            ->whereIn('reservations.status', array_column(ReservationStatus::completedStatuses(), 'value'))
             ->sum('reservations.nombre_convive');
 
         // 4. Taux de satisfaction (avis >= 4/5)
@@ -327,7 +330,7 @@ class TableauBordController extends Controller
             ->join('menu_prestation', 'reservations.menu_prestation_id', '=', 'menu_prestation.id')
             ->join('menus', 'menu_prestation.menu_id', '=', 'menus.id')
             ->where('menus.user_id', $user_id)
-            ->where('reservations.status', 'completed')
+            ->whereIn('reservations.status', array_column(ReservationStatus::completedStatuses(), 'value'))
             ->whereRaw("TO_DATE(SUBSTRING(reservations.date_prestation, 1, 10), 'YYYY-MM-DD') BETWEEN ? AND ?", [
                 $startOfMonth,
                 $endOfMonth
@@ -339,7 +342,7 @@ class TableauBordController extends Controller
             ->join('menu_prestation', 'reservations.menu_prestation_id', '=', 'menu_prestation.id')
             ->join('menus', 'menu_prestation.menu_id', '=', 'menus.id')
             ->where('menus.user_id', $user_id)
-            ->whereIn('reservations.status', ['confirmed', 'pending'])
+            ->whereIn('reservations.status', array_column(ReservationStatus::activeStatuses(), 'value'))
             ->whereRaw("TO_DATE(SUBSTRING(reservations.date_prestation, 1, 10), 'YYYY-MM-DD') >= ?", [
                 $startOfMonth
             ])
@@ -358,7 +361,7 @@ class TableauBordController extends Controller
                 ->join('menu_prestation', 'reservations.menu_prestation_id', '=', 'menu_prestation.id')
                 ->join('menus', 'menu_prestation.menu_id', '=', 'menus.id')
                 ->where('menus.user_id', $user_id)
-                ->where('reservations.status', 'completed')
+                ->whereIn('reservations.status', array_column(ReservationStatus::completedStatuses(), 'value'))
                 ->whereRaw("TO_DATE(SUBSTRING(reservations.date_prestation, 1, 10), 'YYYY-MM-DD') BETWEEN ? AND ?", [
                     $startMois,
                     $endMois
@@ -372,7 +375,7 @@ class TableauBordController extends Controller
                     ->join('menu_prestation', 'reservations.menu_prestation_id', '=', 'menu_prestation.id')
                     ->join('menus', 'menu_prestation.menu_id', '=', 'menus.id')
                     ->where('menus.user_id', $user_id)
-                    ->whereIn('reservations.status', ['confirmed', 'pending'])
+                    ->whereIn('reservations.status', array_column(ReservationStatus::activeStatuses(), 'value'))
                     ->whereRaw("TO_DATE(SUBSTRING(reservations.date_prestation, 1, 10), 'YYYY-MM-DD') BETWEEN ? AND ?", [
                         $startMois,
                         $endMois
@@ -393,7 +396,7 @@ class TableauBordController extends Controller
             ->join('menu_prestation', 'reservations.menu_prestation_id', '=', 'menu_prestation.id')
             ->join('menus', 'menu_prestation.menu_id', '=', 'menus.id')
             ->where('menus.user_id', $user_id)
-            ->where('reservations.status', 'completed')
+            ->whereIn('reservations.status', array_column(ReservationStatus::completedStatuses(), 'value'))
             ->whereRaw("TO_DATE(SUBSTRING(reservations.date_prestation, 1, 10), 'YYYY-MM-DD') BETWEEN ? AND ?", [
                 $startOfMonth,
                 $endOfMonth
@@ -405,7 +408,7 @@ class TableauBordController extends Controller
             ->join('menu_prestation', 'reservations.menu_prestation_id', '=', 'menu_prestation.id')
             ->join('menus', 'menu_prestation.menu_id', '=', 'menus.id')
             ->where('menus.user_id', $user_id)
-            ->where('reservations.status', 'completed')
+            ->whereIn('reservations.status', array_column(ReservationStatus::completedStatuses(), 'value'))
             ->whereRaw("TO_DATE(SUBSTRING(reservations.date_prestation, 1, 10), 'YYYY-MM-DD') BETWEEN ? AND ?", [
                 $startOfMonth,
                 $endOfMonth
@@ -429,7 +432,7 @@ class TableauBordController extends Controller
             ->join('menus', 'menu_prestation.menu_id', '=', 'menus.id')
             ->join('prestations', 'menu_prestation.prestation_id', '=', 'prestations.id')
             ->where('menus.user_id', $user_id)
-            ->whereIn('reservations.status', ['confirmed', 'pending'])
+            ->whereIn('reservations.status', array_column(ReservationStatus::activeStatuses(), 'value'))
             ->whereRaw("TO_DATE(SUBSTRING(reservations.date_prestation, 1, 10), 'YYYY-MM-DD') >= ?", [
                 $startOfMonth
             ])
